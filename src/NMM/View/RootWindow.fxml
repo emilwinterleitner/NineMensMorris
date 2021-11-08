@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.image.ImageView?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="Controller.Controller" prefHeight="530" prefWidth="500"
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="NMM.Controller.Controller" prefHeight="530" prefWidth="500"
       stylesheets="@style.css">
     <MenuBar id="menu-bar">
         <Menu text="Game">

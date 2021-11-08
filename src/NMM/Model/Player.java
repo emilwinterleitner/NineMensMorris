@@ -1,4 +1,4 @@
-package Model;
+package NMM.Model;
 
 public class Player {
     private final String name;

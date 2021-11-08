@@ -8,6 +8,9 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.image.ImageView?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="Controller.Controller" prefHeight="530" prefWidth="500"
       stylesheets="@style.css">
     <MenuBar id="menu-bar">
@@ -18,5 +21,71 @@
         </Menu>
     </MenuBar>
     <GridPane id="board-grid">
+        <columnConstraints>
+            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
+            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
+            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
+            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
+            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
+            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
+            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="0" GridPane.columnIndex="3" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="0" GridPane.columnIndex="6" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="1" GridPane.columnIndex="3" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="1" GridPane.columnIndex="5" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="2" GridPane.columnIndex="2" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="2" GridPane.columnIndex="3" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="2" GridPane.columnIndex="4" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="3" GridPane.columnIndex="0" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="3" GridPane.columnIndex="1" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="3" GridPane.columnIndex="2" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="3" GridPane.columnIndex="4" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="3" GridPane.columnIndex="5" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="3" GridPane.columnIndex="6" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="4" GridPane.columnIndex="2" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="4" GridPane.columnIndex="3" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="4" GridPane.columnIndex="4" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="5" GridPane.columnIndex="1" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="5" GridPane.columnIndex="3" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="5" GridPane.columnIndex="5" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="6" GridPane.columnIndex="0" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="6" GridPane.columnIndex="3" />
+        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
+                   GridPane.rowIndex="6" GridPane.columnIndex="6" />
     </GridPane>
 </VBox>

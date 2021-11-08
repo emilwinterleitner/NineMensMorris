@@ -8,3 +8,8 @@
     -fx-pref-height: 30;
     -fx-alignment: center-left;
 }
+
+#img-view {
+    -fx-column-halignment: CENTER;
+    -fx-row-valignment: CENTER;
+}

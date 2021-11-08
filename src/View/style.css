@@ -1,3 +1,10 @@
-#board-grid{
+#board-grid {
     -fx-background-image: url(file:res/textures/board.png);
+    -fx-pref-height: 500;
+    -fx-pref-width: 500;
+}
+
+#menu-bar {
+    -fx-pref-height: 30;
+    -fx-alignment: center-left;
 }

@@ -5,8 +5,18 @@
 <?import javafx.scene.control.Label?>
 
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="Controller.Controller" prefHeight="500" prefWidth="500"
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="Controller.Controller" prefHeight="530" prefWidth="500"
       stylesheets="@style.css">
-    <GridPane id="board-grid" prefWidth="500" prefHeight="500">
+    <MenuBar id="menu-bar">
+        <Menu text="Game">
+            <MenuItem onAction="#handleNewGame" text="New"/>
+            <MenuItem onAction="#handleSave" text="Save"/>
+            <MenuItem onAction="#handleLoad" text="Load"/>
+        </Menu>
+    </MenuBar>
+    <GridPane id="board-grid">
     </GridPane>
 </VBox>

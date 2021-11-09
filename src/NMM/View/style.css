@@ -9,7 +9,16 @@
     -fx-alignment: center-left;
 }
 
-#img-view {
-    -fx-column-halignment: CENTER;
-    -fx-row-valignment: CENTER;
+#grid-button {
+    -fx-pref-width: 60;
+    -fx-pref-height: 60;
+    -fx-background-color: Transparent;
+    -fx-border-color: Transparent;
+}
+
+#grid-button:hover {
+    -fx-background-color: #AAAAAAAA;
+    -fx-border-color: black;
+    -fx-border-radius: 100;
+    -fx-background-radius: 100;
 }

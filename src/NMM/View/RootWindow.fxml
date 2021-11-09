@@ -11,7 +11,8 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.image.ImageView?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="NMM.Controller.Controller" prefHeight="530" prefWidth="500"
+<?import javafx.scene.layout.HBox?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="NMM.Controller.Controller" prefHeight="580" prefWidth="500"
       stylesheets="@style.css">
     <MenuBar id="menu-bar">
         <Menu text="Game">
@@ -20,72 +21,184 @@
             <MenuItem onAction="#handleLoad" text="Load"/>
         </Menu>
     </MenuBar>
-    <GridPane id="board-grid">
+    <GridPane id="board-grid" fx:id="boardGrid">
         <columnConstraints>
-            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
-            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
-            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
-            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
-            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
-            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
-            <ColumnConstraints minWidth="60" hgrow="SOMETIMES" />
+            <ColumnConstraints percentWidth="15" />
+            <ColumnConstraints percentWidth="15" />
+            <ColumnConstraints percentWidth="15" />
+            <ColumnConstraints percentWidth="15" />
+            <ColumnConstraints percentWidth="15" />
+            <ColumnConstraints percentWidth="15" />
+            <ColumnConstraints percentWidth="15" />
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="60" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="15" />
+            <RowConstraints percentHeight="15" />
+            <RowConstraints percentHeight="15" />
+            <RowConstraints percentHeight="15" />
+            <RowConstraints percentHeight="15" />
+            <RowConstraints percentHeight="15" />
+            <RowConstraints percentHeight="15" />
         </rowConstraints>
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="0" GridPane.columnIndex="3" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="0" GridPane.columnIndex="6" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="1" GridPane.columnIndex="1" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="0" GridPane.columnIndex="0" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="1" GridPane.columnIndex="3" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="1" GridPane.columnIndex="5" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="2" GridPane.columnIndex="2" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="2" GridPane.columnIndex="3" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="2" GridPane.columnIndex="4" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="3" GridPane.columnIndex="0" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="3" GridPane.columnIndex="1" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="3" GridPane.columnIndex="2" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="3" GridPane.columnIndex="4" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="3" GridPane.columnIndex="5" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="3" GridPane.columnIndex="6" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="4" GridPane.columnIndex="2" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="4" GridPane.columnIndex="3" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="4" GridPane.columnIndex="4" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="5" GridPane.columnIndex="1" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="5" GridPane.columnIndex="3" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="5" GridPane.columnIndex="5" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="6" GridPane.columnIndex="0" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="6" GridPane.columnIndex="3" />
-        <ImageView id="img-view" fitHeight="60" fitWidth="60" preserveRatio="true"
-                   GridPane.rowIndex="6" GridPane.columnIndex="6" />
+        <Button id="grid-button" fx:id="btn00" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn03" GridPane.rowIndex="0" GridPane.columnIndex="3"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn06" GridPane.rowIndex="0" GridPane.columnIndex="6"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn11" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn13" GridPane.rowIndex="1" GridPane.columnIndex="3"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn15" GridPane.rowIndex="1" GridPane.columnIndex="5"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn22" GridPane.rowIndex="2" GridPane.columnIndex="2"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn23" GridPane.rowIndex="2" GridPane.columnIndex="3"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn24" GridPane.rowIndex="2" GridPane.columnIndex="4"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn30" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn31" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn32" GridPane.rowIndex="3" GridPane.columnIndex="2"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn34" GridPane.rowIndex="3" GridPane.columnIndex="4"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn35" GridPane.rowIndex="3" GridPane.columnIndex="5"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn36" GridPane.rowIndex="3" GridPane.columnIndex="6"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn42" GridPane.rowIndex="4" GridPane.columnIndex="2"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn43" GridPane.rowIndex="4" GridPane.columnIndex="3"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn44" GridPane.rowIndex="4" GridPane.columnIndex="4"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn51" GridPane.rowIndex="5" GridPane.columnIndex="1"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn53" GridPane.rowIndex="5" GridPane.columnIndex="3"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn55" GridPane.rowIndex="5" GridPane.columnIndex="5"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn60" GridPane.rowIndex="6" GridPane.columnIndex="0"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn63" GridPane.rowIndex="6" GridPane.columnIndex="3"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
+        <Button id="grid-button" fx:id="btn66" GridPane.rowIndex="6" GridPane.columnIndex="6"
+                GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <graphic>
+                <ImageView id="img-view" preserveRatio="true" />
+            </graphic>
+        </Button>
     </GridPane>
+    <HBox prefHeight="50">
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints />
+                <ColumnConstraints />
+                <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
+            <Label text="Current Turn:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <Label id="current-player-label" fx:id="currentPlayerLabel" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        </GridPane>
+    </HBox>
 </VBox>

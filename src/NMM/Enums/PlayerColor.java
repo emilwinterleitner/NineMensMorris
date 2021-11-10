@@ -1,5 +1,5 @@
 package NMM.Enums;
 
 public enum PlayerColor {
-    WHITE, BLACK
+    WHITE, BLACK, GREEN
 }

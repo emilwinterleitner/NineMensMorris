@@ -1,10 +1,7 @@
 package NMM.Model;
 
 import NMM.Enums.PlayerColor;
-import NMM.Interfaces.SelectedTileChangeListener;
-import NMM.Interfaces.TilePlacedListener;
-import NMM.Interfaces.TileRemovedListener;
-import NMM.Interfaces.TileSelectedListener;
+import NMM.Interfaces.*;
 
 import java.util.*;
 
@@ -49,6 +46,7 @@ public class Board {
     private List<TileSelectedListener> tileSelectedListeners = new ArrayList<>();
     private List<SelectedTileChangeListener> selectedTileChangeListeners = new ArrayList<>();
     private List<TileRemovedListener> tileRemovedListeners = new ArrayList<>();
+    private List<AllowedMovesChangedListener> allowedMovesChangedListeners = new ArrayList<>();
 
     private Board() {
         allTiles = new ArrayList<>();
@@ -92,12 +90,12 @@ public class Board {
     public void addTileSelectedListener(TileSelectedListener listener) { tileSelectedListeners.add(listener); }
     public void addSelectedTileChangeListener(SelectedTileChangeListener listener) { selectedTileChangeListeners.add(listener); }
     public void addTileRemovedListener(TileRemovedListener listener) { tileRemovedListeners.add(listener); }
+    public void addAllowedMovesChangedListener(AllowedMovesChangedListener listener) { allowedMovesChangedListeners.add(listener); }
 
     public boolean tryToSelectTile(int row, int col, PlayerColor playerColor) {
         boolean result = false;
-        Tile tile = null;
 
-        tile = getTile(row, col);
+        Tile tile = getTile(row, col);
 
         PlayerColor occupiedBy = gameBoard.get(tile);
 
@@ -105,6 +103,7 @@ public class Board {
             changeSelectedTile(tile, playerColor);
         } else if (occupiedBy == null && selectedTile != null) {
             if (allowedMoves.contains(tile)) {
+                showAllowedMoves(false);
                 tryToSetTile(row, col, playerColor);
                 removeSelectedTile();
                 result = true;
@@ -124,6 +123,8 @@ public class Board {
     }
 
     private void changeSelectedTile(Tile tile, PlayerColor playerColor) {
+        if (!allowedMoves.isEmpty())
+            showAllowedMoves(false);
         if (selectedTile != null) {
             for (SelectedTileChangeListener stcl : selectedTileChangeListeners) {
                 stcl.selectedTileChanged(selectedTile, gameBoard.get(selectedTile));
@@ -137,6 +138,15 @@ public class Board {
         selectedTile = tile;
         getAllowedMoves();
         filterAllowedMoves();
+        showAllowedMoves(true);
+    }
+
+    private void showAllowedMoves(boolean show) {
+        for (AllowedMovesChangedListener amcl : allowedMovesChangedListeners) {
+            amcl.allowedTilesChanged(allowedMoves, show);
+        }
+        if (!show)
+            allowedMoves.clear();
     }
 
     private void filterAllowedMoves() {
@@ -152,8 +162,6 @@ public class Board {
     }
 
     public void getAllowedMoves() {
-        allowedMoves.clear();
-
         if (selectedTile.equals(t00)) {
             allowedMoves.add(t30);
             allowedMoves.add(t03);

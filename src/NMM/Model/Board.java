@@ -3,6 +3,7 @@ package NMM.Model;
 import NMM.Enums.PlayerColor;
 import NMM.Interfaces.SelectedTileChangeListener;
 import NMM.Interfaces.TilePlacedListener;
+import NMM.Interfaces.TileRemovedListener;
 import NMM.Interfaces.TileSelectedListener;
 
 import java.util.*;
@@ -46,6 +47,7 @@ public class Board {
     private List<TilePlacedListener> tilePlacedListeners = new ArrayList<>();
     private List<TileSelectedListener> tileSelectedListeners = new ArrayList<>();
     private List<SelectedTileChangeListener> selectedTileChangeListeners = new ArrayList<>();
+    private List<TileRemovedListener> tileRemovedListeners = new ArrayList<>();
 
     private Board() {
         allTiles = new ArrayList<>();
@@ -87,6 +89,7 @@ public class Board {
     public void addTilePlacedListener(TilePlacedListener listener) { tilePlacedListeners.add(listener); }
     public void addTileSelectedListener(TileSelectedListener listener) { tileSelectedListeners.add(listener); }
     public void addSelectedTileChangeListener(SelectedTileChangeListener listener) { selectedTileChangeListeners.add(listener); }
+    public void addTileRemovedListener(TileRemovedListener listener) { tileRemovedListeners.add(listener); }
 
     public boolean tryToSelectTile(int row, int col, PlayerColor playerColor) {
         boolean result = false;
@@ -97,21 +100,34 @@ public class Board {
         PlayerColor occupiedBy = gameBoard.get(tile);
 
         if (occupiedBy == playerColor) {
-            changeSelectedTile(tile);
-            for (TileSelectedListener tsl : tileSelectedListeners) {
-                tsl.tileSelected(tile, playerColor);
-            }
+            changeSelectedTile(tile, playerColor);
             result = true;
+        } else if (occupiedBy == null && selectedTile != null) {
+            tryToSetTile(row, col, playerColor);
+            removeSelectedTile();
         }
 
         return result;
     }
 
-    private void changeSelectedTile(Tile tile) {
+    private void removeSelectedTile() {
+        freeTiles.add(selectedTile);
+        gameBoard.remove(selectedTile);
+        for (TileRemovedListener trl : tileRemovedListeners) {
+            trl.tileRemoved(selectedTile);
+        }
+        selectedTile = null;
+    }
+
+    private void changeSelectedTile(Tile tile, PlayerColor playerColor) {
         if (selectedTile != null) {
             for (SelectedTileChangeListener stcl : selectedTileChangeListeners) {
                 stcl.selectedTileChanged(selectedTile, gameBoard.get(selectedTile));
             }
+        }
+
+        for (TileSelectedListener tsl : tileSelectedListeners) {
+            tsl.tileSelected(tile, playerColor);
         }
 
         selectedTile = tile;

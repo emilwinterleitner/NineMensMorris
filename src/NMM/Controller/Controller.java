@@ -19,7 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
 public class Controller implements CurrentPlayerListener, TilePlacedListener, GamePhaseListener, TileSelectedListener,
-    SelectedTileChangeListener {
+    SelectedTileChangeListener, TileRemovedListener {
     private Board board;
     private GameManager manager;
 
@@ -81,6 +81,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
         board.addTilePlacedListener(this);
         board.addTileSelectedListener(this);
         board.addSelectedTileChangeListener(this);
+        board.addTileRemovedListener(this);
 
         btn00.setOnAction(event -> tileClicked(event.getTarget()));
         btn03.setOnAction(event -> tileClicked(event.getTarget()));
@@ -155,5 +156,11 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     public void selectedTileChanged(Tile t, PlayerColor color) {
         Button b = (Button) getNode(t.getX(), t.getY());
         b.setGraphic(TileFactory.getTile(color, false, false));
+    }
+
+    @Override
+    public void tileRemoved(Tile t) {
+        Button b = (Button) getNode(t.getX(), t.getY());
+        b.setGraphic(null);
     }
 }

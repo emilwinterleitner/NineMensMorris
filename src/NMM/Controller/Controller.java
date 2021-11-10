@@ -1,6 +1,7 @@
 package NMM.Controller;
 
 import NMM.Enums.PlayerColor;
+import NMM.Factory.TileFactory;
 import NMM.GameManager;
 import NMM.Interfaces.CurrentPlayerListener;
 import NMM.Interfaces.TilePlacedListener;
@@ -124,9 +125,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener {
             if (GridPane.getRowIndex(n) == t.getY()
                 && GridPane.getColumnIndex(n) == t.getX()) {
                 Button b = (Button) n;
-                Image img = new Image("file:res/textures/white.png");
-                ImageView imgView = new ImageView(img);
-                b.setGraphic(imgView);
+                b.setGraphic(TileFactory.getTile(color, false));
             }
         }
     }

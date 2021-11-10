@@ -101,10 +101,10 @@ public class Board {
 
         if (occupiedBy == playerColor) {
             changeSelectedTile(tile, playerColor);
-            result = true;
         } else if (occupiedBy == null && selectedTile != null) {
             tryToSetTile(row, col, playerColor);
             removeSelectedTile();
+            result = true;
         }
 
         return result;

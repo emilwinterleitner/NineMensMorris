@@ -103,12 +103,10 @@ public class GameManager {
                 phase = GamePhase.MOVE;
                 notifyGamePhaseChanged();
             }
-
-            if (validMove)
-                endTurn();
-        } else {
-
         }
+
+        if (validMove)
+            endTurn();
     }
 
     private void endTurn() {

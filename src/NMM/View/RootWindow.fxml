@@ -186,19 +186,22 @@
         </Button>
     </GridPane>
     <HBox prefHeight="50">
-        <GridPane>
+        <GridPane prefWidth="500">
             <columnConstraints>
-                <ColumnConstraints />
-                <ColumnConstraints />
-                <ColumnConstraints />
+                <ColumnConstraints percentWidth="50" />
+                <ColumnConstraints percentWidth="50" />
+                <ColumnConstraints percentWidth="50" />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints />
                 <RowConstraints />
-                <RowConstraints />
             </rowConstraints>
-            <Label text="Current Turn:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <Label id="current-player-label" fx:id="currentPlayerLabel" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <Label text="Current Turn:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="CENTER" />
+            <Label id="current-player-label" fx:id="currentPlayerLabel" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                GridPane.halignment="CENTER" />
+            <Label text="Current Phase:" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+            <Label id="current-phase-label" fx:id="currentPhaseLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                GridPane.halignment="CENTER"  />
         </GridPane>
     </HBox>
 </VBox>

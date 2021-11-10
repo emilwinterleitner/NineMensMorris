@@ -1,9 +1,11 @@
 package NMM.Controller;
 
+import NMM.Enums.GamePhase;
 import NMM.Enums.PlayerColor;
 import NMM.Factory.TileFactory;
 import NMM.GameManager;
 import NMM.Interfaces.CurrentPlayerListener;
+import NMM.Interfaces.GamePhaseListener;
 import NMM.Interfaces.TilePlacedListener;
 import NMM.Model.Player;
 import NMM.Model.Tile;
@@ -20,7 +22,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
-public class Controller implements CurrentPlayerListener, TilePlacedListener {
+public class Controller implements CurrentPlayerListener, TilePlacedListener, GamePhaseListener {
     private Board board;
     private GameManager manager;
 
@@ -30,6 +32,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener {
     private GridPane boardGrid;
     @FXML
     private Label currentPlayerLabel;
+    @FXML Label currentPhaseLabel;
     @FXML Button btn00;
     @FXML Button btn03;
     @FXML Button btn06;
@@ -71,13 +74,14 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener {
 
     public void setGameManager(GameManager manager) {
         this.manager = manager;
-        manager.addCurrentPlayerListener(this::playerChanged);
+        manager.addCurrentPlayerListener(this);
+        manager.addGamePhaseListener(this);
     }
 
     @FXML
     private void initialize() {
         board = Board.getInstance();
-        board.addTilePlacedListener(this::tilePlaced);
+        board.addTilePlacedListener(this);
 
         btn00.setOnAction(event -> tileClicked(event.getTarget()));
         btn03.setOnAction(event -> tileClicked(event.getTarget()));
@@ -128,5 +132,10 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener {
                 b.setGraphic(TileFactory.getTile(color, false));
             }
         }
+    }
+
+    @Override
+    public void gamePhaseChanged(GamePhase gamePhase) {
+        currentPhaseLabel.setText(gamePhase.toString());
     }
 }

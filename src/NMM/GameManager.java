@@ -2,6 +2,7 @@ package NMM;
 
 import NMM.Enums.GamePhase;
 import NMM.Interfaces.CurrentPlayerListener;
+import NMM.Interfaces.GamePhaseListener;
 import NMM.Model.Board;
 import NMM.Model.History;
 import NMM.Model.Player;
@@ -17,6 +18,8 @@ public class GameManager {
 
     private List<CurrentPlayerListener> currentPlayerListeners = new ArrayList<CurrentPlayerListener>();
 
+    private List<GamePhaseListener> gamePhaseListeners = new ArrayList<GamePhaseListener>();
+
     private Board board;
 
     private GamePhase phase;
@@ -31,7 +34,7 @@ public class GameManager {
         player1 = p1;
         player2 = p2;
 
-        this.phase = phase;
+        tiles_placed = 0;
 
         if (hist != null)
             history = hist;
@@ -49,6 +52,10 @@ public class GameManager {
 
     public void addCurrentPlayerListener(CurrentPlayerListener listener) {
         currentPlayerListeners.add(listener);
+    }
+
+    public void addGamePhaseListener(GamePhaseListener listener) {
+        gamePhaseListeners.add(listener);
     }
 
     public Board getBoard() {
@@ -74,9 +81,9 @@ public class GameManager {
 
     public void startGame() {
         currentPlayer = player1;
-
-        for (CurrentPlayerListener cpl : currentPlayerListeners)
-            cpl.playerChanged(currentPlayer);
+        phase = GamePhase.PLACE;
+        notifyPlayerChanged();
+        notifyGamePhaseChanged();
     }
 
     public void tilePressed(int row, int col) {
@@ -84,6 +91,29 @@ public class GameManager {
 
         if (!isTileSet) return;     // Display error message?
 
+        tiles_placed++;
+
+        endTurn();
+    }
+
+    private void endTurn() {
+        if (phase != GamePhase.MOVE && tiles_placed >= 18) advancePhase();
         changePlayer();
+    }
+
+    private void advancePhase() {
+        phase = GamePhase.MOVE;
+        notifyGamePhaseChanged();
+    }
+
+    private void notifyPlayerChanged() {
+        for (CurrentPlayerListener cpl : currentPlayerListeners)
+            cpl.playerChanged(currentPlayer);
+    }
+
+    private void notifyGamePhaseChanged() {
+        for (GamePhaseListener gpl : gamePhaseListeners) {
+            gpl.gamePhaseChanged(phase);
+        }
     }
 }

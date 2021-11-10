@@ -61,6 +61,7 @@ public class Board {
 
     public boolean tryToSetTile(int row, int col, PlayerColor playerColor) {
         boolean result = false;
+        Tile tileToRemove = null;
 
         for (Tile t : freeTiles) {
             if (t.getX() == col && t.getY() == row) {
@@ -68,8 +69,11 @@ public class Board {
                 for (TilePlacedListener tpl : tilePlacedListeners) {
                     tpl.tilePlaced(t, playerColor);
                 }
+                tileToRemove = t;
             }
         }
+
+        if (result) freeTiles.remove(tileToRemove);
 
         return result;
     }

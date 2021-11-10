@@ -80,6 +80,10 @@ public class GameManager {
     }
 
     public void tilePressed(int row, int col) {
-        board.tryToSetTile(row, col, currentPlayer.getPlayerColor());
+        boolean isTileSet = board.tryToSetTile(row, col, currentPlayer.getPlayerColor());
+
+        if (!isTileSet) return;     // Display error message?
+
+        changePlayer();
     }
 }

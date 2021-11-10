@@ -1,6 +1,8 @@
 package NMM;
 
 import NMM.Enums.GamePhase;
+import NMM.GameManagerState.GameManagerPlaceState;
+import NMM.GameManagerState.GameManagerState;
 import NMM.Interfaces.CurrentPlayerListener;
 import NMM.Interfaces.GamePhaseListener;
 import NMM.Model.Board;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager {
+    private GameManagerState gameManagerState;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
@@ -35,6 +38,8 @@ public class GameManager {
         player2 = p2;
 
         tiles_placed = 0;
+
+        gameManagerState = new GameManagerPlaceState();
 
         if (hist != null)
             history = hist;
@@ -87,9 +92,9 @@ public class GameManager {
     }
 
     public void tilePressed(int row, int col) {
-        boolean isTileSet = board.tryToSetTile(row, col, currentPlayer.getPlayerColor());
+        boolean validMove = gameManagerState.tilePressed(board, row, col, currentPlayer.getPlayerColor());
 
-        if (!isTileSet) return;     // Display error message?
+        if (!validMove) return;     // Display error message?
 
         tiles_placed++;
 

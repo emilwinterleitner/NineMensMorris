@@ -4,10 +4,7 @@ import NMM.Enums.GamePhase;
 import NMM.Enums.PlayerColor;
 import NMM.Factory.TileFactory;
 import NMM.GameManager;
-import NMM.Interfaces.CurrentPlayerListener;
-import NMM.Interfaces.GamePhaseListener;
-import NMM.Interfaces.TilePlacedListener;
-import NMM.Interfaces.TileSelectedListener;
+import NMM.Interfaces.*;
 import NMM.Model.Player;
 import NMM.Model.Tile;
 import javafx.collections.FXCollections;
@@ -19,11 +16,10 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
-public class Controller implements CurrentPlayerListener, TilePlacedListener, GamePhaseListener, TileSelectedListener {
+public class Controller implements CurrentPlayerListener, TilePlacedListener, GamePhaseListener, TileSelectedListener,
+    SelectedTileChangeListener {
     private Board board;
     private GameManager manager;
 
@@ -84,6 +80,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
         board = Board.getInstance();
         board.addTilePlacedListener(this);
         board.addTileSelectedListener(this);
+        board.addSelectedTileChangeListener(this);
 
         btn00.setOnAction(event -> tileClicked(event.getTarget()));
         btn03.setOnAction(event -> tileClicked(event.getTarget()));
@@ -152,5 +149,11 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
         }
 
         return node;
+    }
+
+    @Override
+    public void selectedTileChanged(Tile t, PlayerColor color) {
+        Button b = (Button) getNode(t.getX(), t.getY());
+        b.setGraphic(TileFactory.getTile(color, false, false));
     }
 }

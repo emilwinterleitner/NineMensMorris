@@ -95,7 +95,7 @@ public class GameManager {
     public void tilePressed(int row, int col) {
         boolean validMove = gameManagerState.tilePressed(board, row, col, currentPlayer.getPlayerColor());
 
-        if (!validMove) return;
+
 
         if (gameManagerState instanceof GameManagerPlaceState) {
             if (++tiles_placed > 17) {
@@ -103,9 +103,12 @@ public class GameManager {
                 phase = GamePhase.MOVE;
                 notifyGamePhaseChanged();
             }
-        }
 
-        endTurn();
+            if (validMove)
+                endTurn();
+        } else {
+
+        }
     }
 
     private void endTurn() {

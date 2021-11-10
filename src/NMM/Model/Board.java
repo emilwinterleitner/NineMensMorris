@@ -1,6 +1,7 @@
 package NMM.Model;
 
 import NMM.Enums.PlayerColor;
+import NMM.Interfaces.SelectedTileChangeListener;
 import NMM.Interfaces.TilePlacedListener;
 import NMM.Interfaces.TileSelectedListener;
 
@@ -40,8 +41,11 @@ public class Board {
     private Tile t63 = new Tile(6, 3);
     private Tile t66 = new Tile(6, 6);
 
+    private Tile selectedTile;
+
     private List<TilePlacedListener> tilePlacedListeners = new ArrayList<>();
     private List<TileSelectedListener> tileSelectedListeners = new ArrayList<>();
+    private List<SelectedTileChangeListener> selectedTileChangeListeners = new ArrayList<>();
 
     private Board() {
         allTiles = new ArrayList<>();
@@ -82,6 +86,7 @@ public class Board {
 
     public void addTilePlacedListener(TilePlacedListener listener) { tilePlacedListeners.add(listener); }
     public void addTileSelectedListener(TileSelectedListener listener) { tileSelectedListeners.add(listener); }
+    public void addSelectedTileChangeListener(SelectedTileChangeListener listener) { selectedTileChangeListeners.add(listener); }
 
     public boolean tryToSelectTile(int row, int col, PlayerColor playerColor) {
         boolean result = false;
@@ -90,7 +95,9 @@ public class Board {
         tile = getTile(row, col);
 
         PlayerColor occupiedBy = gameBoard.get(tile);
+
         if (occupiedBy == playerColor) {
+            changeSelectedTile(tile);
             for (TileSelectedListener tsl : tileSelectedListeners) {
                 tsl.tileSelected(tile, playerColor);
             }
@@ -98,6 +105,16 @@ public class Board {
         }
 
         return result;
+    }
+
+    private void changeSelectedTile(Tile tile) {
+        if (selectedTile != null) {
+            for (SelectedTileChangeListener stcl : selectedTileChangeListeners) {
+                stcl.selectedTileChanged(selectedTile, gameBoard.get(selectedTile));
+            }
+        }
+
+        selectedTile = tile;
     }
 
     private Tile getTile(int row, int col) {

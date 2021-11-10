@@ -15,6 +15,7 @@ public class Board {
 
     private List<Tile> allTiles;
     private List<Tile> freeTiles;
+    private List<Tile> allowedMoves;
 
     // All tiles of the game board,
     private Tile t00 = new Tile(0, 0);
@@ -58,6 +59,7 @@ public class Board {
             t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
 
         gameBoard = new HashMap<>();
+        allowedMoves = new ArrayList<>();
     }
 
     public static Board getInstance() {
@@ -102,9 +104,11 @@ public class Board {
         if (occupiedBy == playerColor) {
             changeSelectedTile(tile, playerColor);
         } else if (occupiedBy == null && selectedTile != null) {
-            tryToSetTile(row, col, playerColor);
-            removeSelectedTile();
-            result = true;
+            if (allowedMoves.contains(tile)) {
+                tryToSetTile(row, col, playerColor);
+                removeSelectedTile();
+                result = true;
+            }
         }
 
         return result;
@@ -131,6 +135,114 @@ public class Board {
         }
 
         selectedTile = tile;
+        getAllowedMoves();
+        filterAllowedMoves();
+    }
+
+    private void filterAllowedMoves() {
+        List<Tile> invalidMoves = new ArrayList<>();
+
+        for (Tile t : allowedMoves) {
+            if (gameBoard.get(t) != null) {
+                invalidMoves.add(t);
+            }
+        }
+
+        allowedMoves.removeAll(invalidMoves);
+    }
+
+    public void getAllowedMoves() {
+        allowedMoves.clear();
+
+        if (selectedTile.equals(t00)) {
+            allowedMoves.add(t30);
+            allowedMoves.add(t03);
+        } else if (selectedTile.equals(t03)) {
+            allowedMoves.add(t00);
+            allowedMoves.add(t06);
+            allowedMoves.add(t13);
+        } else if (selectedTile.equals(t06)) {
+            allowedMoves.add(t03);
+            allowedMoves.add(t36);
+        } else if (selectedTile.equals(t11)) {
+            allowedMoves.add(t31);
+            allowedMoves.add(t13);
+        } else if (selectedTile.equals(t13)) {
+            allowedMoves.add(t11);
+            allowedMoves.add(t15);
+            allowedMoves.add(t03);
+            allowedMoves.add(t23);
+        } else if (selectedTile.equals(t15)) {
+            allowedMoves.add(t13);
+            allowedMoves.add(t35);
+        } else if (selectedTile.equals(t22)) {
+            allowedMoves.add(t32);
+            allowedMoves.add(t23);
+        } else if (selectedTile.equals(t23)) {
+            allowedMoves.add(t22);
+            allowedMoves.add(t24);
+            allowedMoves.add(t13);
+        } else if (selectedTile.equals(t24)) {
+            allowedMoves.add(t23);
+            allowedMoves.add(t34);
+        } else if (selectedTile.equals(t30)) {
+            allowedMoves.add(t00);
+            allowedMoves.add(t60);
+            allowedMoves.add(t31);
+        } else if (selectedTile.equals(t31)) {
+            allowedMoves.add(t51);
+            allowedMoves.add(t11);
+            allowedMoves.add(t30);
+            allowedMoves.add(t32);
+        } else if (selectedTile.equals(t32)) {
+            allowedMoves.add(t22);
+            allowedMoves.add(t42);
+            allowedMoves.add(t31);
+        } else if (selectedTile.equals(t34)) {
+            allowedMoves.add(t24);
+            allowedMoves.add(t44);
+            allowedMoves.add(t35);
+        } else if (selectedTile.equals(t35)) {
+            allowedMoves.add(t15);
+            allowedMoves.add(t55);
+            allowedMoves.add(t34);
+            allowedMoves.add(t36);
+        } else if (selectedTile.equals(t36)) {
+            allowedMoves.add(t06);
+            allowedMoves.add(t66);
+            allowedMoves.add(t35);
+        } else if (selectedTile.equals(t42)) {
+            allowedMoves.add(t32);
+            allowedMoves.add(t43);
+        } else if (selectedTile.equals(t43)) {
+            allowedMoves.add(t42);
+            allowedMoves.add(t44);
+            allowedMoves.add(t53);
+        } else if (selectedTile.equals(t44)) {
+            allowedMoves.add(t34);
+            allowedMoves.add(t43);
+        } else if (selectedTile.equals(t51)) {
+            allowedMoves.add(t31);
+            allowedMoves.add(t53);
+        } else if (selectedTile.equals(t53)) {
+            allowedMoves.add(t51);
+            allowedMoves.add(t55);
+            allowedMoves.add(t43);
+            allowedMoves.add(t63);
+        } else if (selectedTile.equals(t55)) {
+            allowedMoves.add(t53);
+            allowedMoves.add(t35);
+        } else if (selectedTile.equals(t60)) {
+            allowedMoves.add(t30);
+            allowedMoves.add(t63);
+        } else if (selectedTile.equals(t63)) {
+            allowedMoves.add(t60);
+            allowedMoves.add(t66);
+            allowedMoves.add(t53);
+        } else if (selectedTile.equals(t66)) {
+            allowedMoves.add(t36);
+            allowedMoves.add(t63);
+        }
     }
 
     private Tile getTile(int row, int col) {

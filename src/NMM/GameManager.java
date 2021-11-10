@@ -123,4 +123,12 @@ public class GameManager {
             gpl.gamePhaseChanged(phase);
         }
     }
+
+    public void Undo() {
+        System.out.println("UNDO");
+    }
+
+    public void Redo() {
+        System.out.println("REDO");
+    }
 }

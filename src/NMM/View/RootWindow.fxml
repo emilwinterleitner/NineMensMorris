@@ -196,12 +196,16 @@
                 <RowConstraints />
                 <RowConstraints />
             </rowConstraints>
-            <Label text="Current Turn:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="CENTER" />
+            <Label text="Current Turn:" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.halignment="LEFT" />
             <Label id="current-player-label" fx:id="currentPlayerLabel" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                GridPane.halignment="CENTER" />
+                GridPane.halignment="LEFT" />
             <Label text="Current Phase:" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
             <Label id="current-phase-label" fx:id="currentPhaseLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"
                 GridPane.halignment="CENTER"  />
+            <Button text="UNDO" GridPane.rowIndex="0" GridPane.columnIndex="2" GridPane.halignment="RIGHT"
+                    prefWidth="100" fx:id="btnUndo" />
+            <Button text="REDO" GridPane.rowIndex="1" GridPane.columnIndex="2" GridPane.halignment="RIGHT"
+                    prefWidth="100" fx:id="btnRedo" />
         </GridPane>
     </HBox>
 </VBox>

@@ -32,7 +32,12 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     private GridPane boardGrid;
     @FXML
     private Label currentPlayerLabel;
-    @FXML Label currentPhaseLabel;
+    @FXML
+    private Label currentPhaseLabel;
+    @FXML
+    private Button btnUndo;
+    @FXML
+    private Button btnRedo;
     @FXML Button btn00;
     @FXML Button btn03;
     @FXML Button btn06;
@@ -112,6 +117,8 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
         btn63.setOnAction(event -> tileClicked(event.getTarget()));
         btn66.setOnAction(event -> tileClicked(event.getTarget()));
 
+        btnUndo.setOnAction(event -> manager.Undo());
+        btnRedo.setOnAction(event -> manager.Redo());
     }
 
     private void tileClicked(EventTarget target) {

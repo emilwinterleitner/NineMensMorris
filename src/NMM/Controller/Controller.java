@@ -124,7 +124,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener {
             if (GridPane.getRowIndex(n) == t.getY()
                 && GridPane.getColumnIndex(n) == t.getX()) {
                 Button b = (Button) n;
-                Image img = new Image("../../../res/textures/white.png");
+                Image img = new Image("file:res/textures/white.png");
                 ImageView imgView = new ImageView(img);
                 b.setGraphic(imgView);
             }

@@ -7,6 +7,7 @@ import NMM.GameManager;
 import NMM.Interfaces.CurrentPlayerListener;
 import NMM.Interfaces.GamePhaseListener;
 import NMM.Interfaces.TilePlacedListener;
+import NMM.Interfaces.TileSelectedListener;
 import NMM.Model.Player;
 import NMM.Model.Tile;
 import javafx.collections.FXCollections;
@@ -22,7 +23,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
-public class Controller implements CurrentPlayerListener, TilePlacedListener, GamePhaseListener {
+public class Controller implements CurrentPlayerListener, TilePlacedListener, GamePhaseListener, TileSelectedListener {
     private Board board;
     private GameManager manager;
 
@@ -82,6 +83,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     private void initialize() {
         board = Board.getInstance();
         board.addTilePlacedListener(this);
+        board.addTileSelectedListener(this);
 
         btn00.setOnAction(event -> tileClicked(event.getTarget()));
         btn03.setOnAction(event -> tileClicked(event.getTarget()));
@@ -124,18 +126,31 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
 
     @Override
     public void tilePlaced(Tile t, PlayerColor color) {
-        System.out.println("Tile placed");
-        for (Node n : boardGrid.getChildren()) {
-            if (GridPane.getRowIndex(n) == t.getY()
-                && GridPane.getColumnIndex(n) == t.getX()) {
-                Button b = (Button) n;
-                b.setGraphic(TileFactory.getTile(color, false));
-            }
-        }
+        Button b = (Button) getNode(t.getX(), t.getY());
+        b.setGraphic(TileFactory.getTile(color, false, false));
     }
 
     @Override
     public void gamePhaseChanged(GamePhase gamePhase) {
         currentPhaseLabel.setText(gamePhase.toString());
+    }
+
+    @Override
+    public void tileSelected(Tile t, PlayerColor color) {
+        Button b = (Button) getNode(t.getX(), t.getY());
+        b.setGraphic(TileFactory.getTile(color, false, true));
+    }
+
+    private Node getNode(int x, int y) {
+        Node node = null;
+
+        for (Node n : boardGrid.getChildren()) {
+            if (GridPane.getRowIndex(n) == y
+                && GridPane.getColumnIndex(n) == x) {
+                node = n;
+            }
+        }
+
+        return node;
     }
 }

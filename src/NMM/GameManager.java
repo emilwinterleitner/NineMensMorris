@@ -1,6 +1,7 @@
 package NMM;
 
 import NMM.Enums.GamePhase;
+import NMM.GameManagerState.GameManagerMoveState;
 import NMM.GameManagerState.GameManagerPlaceState;
 import NMM.GameManagerState.GameManagerState;
 import NMM.Interfaces.CurrentPlayerListener;
@@ -94,21 +95,21 @@ public class GameManager {
     public void tilePressed(int row, int col) {
         boolean validMove = gameManagerState.tilePressed(board, row, col, currentPlayer.getPlayerColor());
 
-        if (!validMove) return;     // Display error message?
+        if (!validMove) return;
 
-        tiles_placed++;
+        if (gameManagerState instanceof GameManagerPlaceState) {
+            if (++tiles_placed > 17) {
+                gameManagerState = new GameManagerMoveState();
+                phase = GamePhase.MOVE;
+                notifyGamePhaseChanged();
+            }
+        }
 
         endTurn();
     }
 
     private void endTurn() {
-        if (phase != GamePhase.MOVE && tiles_placed >= 18) advancePhase();
         changePlayer();
-    }
-
-    private void advancePhase() {
-        phase = GamePhase.MOVE;
-        notifyGamePhaseChanged();
     }
 
     private void notifyPlayerChanged() {

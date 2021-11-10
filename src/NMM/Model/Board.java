@@ -2,16 +2,14 @@ package NMM.Model;
 
 import NMM.Enums.PlayerColor;
 import NMM.Interfaces.TilePlacedListener;
+import NMM.Interfaces.TileSelectedListener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Board {
     private static Board instance;
 
-    private Map<Tile, Player> gameBoard;
+    private Map<Tile, PlayerColor> gameBoard;
 
     private List<Tile> allTiles;
     private List<Tile> freeTiles;
@@ -43,6 +41,7 @@ public class Board {
     private Tile t66 = new Tile(6, 6);
 
     private List<TilePlacedListener> tilePlacedListeners = new ArrayList<>();
+    private List<TileSelectedListener> tileSelectedListeners = new ArrayList<>();
 
     private Board() {
         allTiles = new ArrayList<>();
@@ -51,6 +50,8 @@ public class Board {
         freeTiles = new ArrayList<>();
         freeTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
             t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
+
+        gameBoard = new HashMap<>();
     }
 
     public static Board getInstance() {
@@ -61,22 +62,54 @@ public class Board {
 
     public boolean tryToSetTile(int row, int col, PlayerColor playerColor) {
         boolean result = false;
-        Tile tileToRemove = null;
+        Tile tile = null;
 
-        for (Tile t : freeTiles) {
-            if (t.getX() == col && t.getY() == row) {
-                result = true;
-                for (TilePlacedListener tpl : tilePlacedListeners) {
-                    tpl.tilePlaced(t, playerColor);
-                }
-                tileToRemove = t;
+        tile = getTile(row, col);
+        result = gameBoard.get(tile) == null;
+
+        if (result) {
+            for (TilePlacedListener tpl : tilePlacedListeners) {
+                tpl.tilePlaced(tile, playerColor);
             }
-        }
 
-        if (result) freeTiles.remove(tileToRemove);
+            freeTiles.remove(tile);
+
+            gameBoard.put(tile, playerColor);
+        }
 
         return result;
     }
 
     public void addTilePlacedListener(TilePlacedListener listener) { tilePlacedListeners.add(listener); }
+    public void addTileSelectedListener(TileSelectedListener listener) { tileSelectedListeners.add(listener); }
+
+    public boolean tryToSelectTile(int row, int col, PlayerColor playerColor) {
+        boolean result = false;
+        Tile tile = null;
+
+        tile = getTile(row, col);
+
+        PlayerColor occupiedBy = gameBoard.get(tile);
+        if (occupiedBy == playerColor) {
+            for (TileSelectedListener tsl : tileSelectedListeners) {
+                tsl.tileSelected(tile, playerColor);
+            }
+            result = true;
+        }
+
+        return result;
+    }
+
+    private Tile getTile(int row, int col) {
+        Tile requestedTile = null;
+
+        for (Tile t : allTiles) {
+            if (t.getX() == col && t.getY() == row) {
+                requestedTile = t;
+                break;
+            }
+        }
+
+        return requestedTile;
+    }
 }

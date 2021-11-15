@@ -43,6 +43,7 @@ public class Board {
     private Tile t66 = new Tile(6, 6);
 
     private Tile selectedTile;
+    private Tile originTile;
     private Tile lastModifiedTile;
 
     private List<TilePlacedListener> tilePlacedListeners = new ArrayList<>();
@@ -68,6 +69,10 @@ public class Board {
         if (instance == null)
             instance = new Board();
         return instance;
+    }
+
+    public Tile getOriginTile() {
+        return originTile;
     }
 
     public boolean tryToSetTile(int row, int col, PlayerColor playerColor) {
@@ -138,7 +143,16 @@ public class Board {
         return result;
     }
 
+    public void removeTileFromHistory(Tile tileToRemove) {
+        freeTiles.add(tileToRemove);
+        gameBoard.remove(tileToRemove);
+        for (TileRemovedListener trl : tileRemovedListeners) {
+            trl.tileRemoved(tileToRemove);
+        }
+    }
+
     private void removeSelectedTile() {
+        originTile = selectedTile;
         merelManager.removeMerel(selectedTile);
         freeTiles.add(selectedTile);
         gameBoard.remove(selectedTile);
@@ -279,7 +293,7 @@ public class Board {
         }
     }
 
-    private Tile getTile(int row, int col) {
+    public Tile getTile(int row, int col) {
         Tile requestedTile = null;
 
         for (Tile t : allTiles) {
@@ -369,4 +383,7 @@ public class Board {
         return merelFound;
     }
 
+    public void removeMerelFromHistory(Tile tile) {
+        merelManager.removeMerel(tile);
+    }
 }

@@ -8,9 +8,12 @@ public class Move {
     private final PlayerColor player;
     private ArrayList<Tile> move;
 
+    private boolean isTileRemoved;
+
     public Move (PlayerColor color) {
         player = color;
         move = new ArrayList<>();
+        isTileRemoved = false;
     }
 
     public void addTile(Tile t) {
@@ -21,7 +24,15 @@ public class Move {
         return move;
     }
 
-    public PlayerColor getPlayer() {
+    public PlayerColor getPlayerColor() {
         return player;
+    }
+
+    public void setIsTileRemoved() {
+        isTileRemoved = true;
+    }
+
+    public boolean getIsTileRemoved() {
+        return isTileRemoved;
     }
 }

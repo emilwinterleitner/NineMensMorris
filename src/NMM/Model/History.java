@@ -1,9 +1,10 @@
 package NMM.Model;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class History {
-    private LinkedList<Move> history;
+    private List<Move> history;
 
     private int currentIndex = -1;
 
@@ -12,17 +13,19 @@ public class History {
     }
 
     public void addMove(Move move) {
+        if (currentIndex != history.size() - 1)
+            history = history.subList(0, currentIndex + 1);
         history.add(move);
         currentIndex = history.size() - 1;
     }
 
     public Move undoMove() {
-        currentIndex = currentIndex == 0 ? 0 : --currentIndex;
-        return history.get(currentIndex);
+        currentIndex = Math.max(currentIndex, 0);
+        return history.get(currentIndex--);
     }
 
     public Move redoMove() {
-        currentIndex = currentIndex >= history.size() - 1 ? history.size() - 1 : ++currentIndex;
-        return history.get(currentIndex);
+        currentIndex = currentIndex >= history.size() - 1 ? history.size() - 2 : currentIndex;
+        return history.get(++currentIndex);
     }
 }

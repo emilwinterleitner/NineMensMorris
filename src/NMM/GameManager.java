@@ -3,6 +3,7 @@ package NMM;
 import NMM.Enums.GamePhase;
 import NMM.GameManagerState.GameManagerMoveState;
 import NMM.GameManagerState.GameManagerPlaceState;
+import NMM.GameManagerState.GameManagerRemoveState;
 import NMM.GameManagerState.GameManagerState;
 import NMM.Interfaces.CurrentPlayerListener;
 import NMM.Interfaces.GamePhaseListener;
@@ -95,8 +96,6 @@ public class GameManager {
     public void tilePressed(int row, int col) {
         boolean validMove = gameManagerState.tilePressed(board, row, col, currentPlayer.getPlayerColor());
 
-
-
         if (gameManagerState instanceof GameManagerPlaceState) {
             if (++tiles_placed > 17) {
                 gameManagerState = new GameManagerMoveState();
@@ -105,8 +104,23 @@ public class GameManager {
             }
         }
 
-        if (validMove)
-            endTurn();
+        if (validMove) {
+            if (gameManagerState instanceof GameManagerRemoveState) {
+                System.out.println("Switching back");
+                if (phase == GamePhase.MOVE)
+                    gameManagerState = new GameManagerMoveState();
+                else
+                    gameManagerState = new GameManagerPlaceState();
+            }
+
+            if (board.checkForMerels()) {
+                System.out.println("Merel detected");
+                gameManagerState = new GameManagerRemoveState();
+            }
+
+            if (!(gameManagerState instanceof GameManagerRemoveState))
+                endTurn();
+        }
     }
 
     private void endTurn() {

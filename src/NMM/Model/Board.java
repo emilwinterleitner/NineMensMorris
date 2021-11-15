@@ -8,6 +8,8 @@ import java.util.*;
 public class Board {
     private static Board instance;
 
+    private MerelManager merelManager;
+
     private Map<Tile, PlayerColor> gameBoard;
 
     private List<Tile> allTiles;
@@ -41,6 +43,7 @@ public class Board {
     private Tile t66 = new Tile(6, 6);
 
     private Tile selectedTile;
+    private Tile lastModifiedTile;
 
     private List<TilePlacedListener> tilePlacedListeners = new ArrayList<>();
     private List<TileSelectedListener> tileSelectedListeners = new ArrayList<>();
@@ -58,6 +61,7 @@ public class Board {
 
         gameBoard = new HashMap<>();
         allowedMoves = new ArrayList<>();
+        merelManager = new MerelManager();
     }
 
     public static Board getInstance() {
@@ -81,6 +85,8 @@ public class Board {
             freeTiles.remove(tile);
 
             gameBoard.put(tile, playerColor);
+
+            lastModifiedTile = tile;
         }
 
         return result;
@@ -113,7 +119,27 @@ public class Board {
         return result;
     }
 
+    public boolean tryToRemoveTile(int row, int col, PlayerColor color) {
+        boolean result = false;
+
+        Tile tile = getTile(row, col);
+
+        PlayerColor occupiedBy = gameBoard.get(tile);
+
+        if (occupiedBy != color && occupiedBy != null) {
+            freeTiles.add(tile);
+            gameBoard.remove(tile);
+            for (TileRemovedListener trl : tileRemovedListeners) {
+                trl.tileRemoved(tile);
+            }
+            result = true;
+        }
+
+        return result;
+    }
+
     private void removeSelectedTile() {
+        merelManager.removeMerel(selectedTile);
         freeTiles.add(selectedTile);
         gameBoard.remove(selectedTile);
         for (TileRemovedListener trl : tileRemovedListeners) {
@@ -265,4 +291,82 @@ public class Board {
 
         return requestedTile;
     }
+
+    public boolean checkForMerels() {
+        boolean result = false;
+
+        if (lastModifiedTile != null) {
+            if (lastModifiedTile.equals(t00)) {
+                result = checkLocation(t00, t30, t60, t00, t03, t06);
+            } else if (lastModifiedTile.equals(t03)) {
+                result = checkLocation(t00, t03, t06, t03, t13, t23);
+            } else if (lastModifiedTile.equals(t06)) {
+                result = checkLocation(t00, t03, t06, t06, t36, t66);
+            } else if (lastModifiedTile.equals(t11)) {
+                result = checkLocation(t11, t13, t15, t11, t31, t51);
+            } else if (lastModifiedTile.equals(t13)) {
+                result = checkLocation(t11, t13, t15, t03, t13, t23);
+            } else if (lastModifiedTile.equals(t15)) {
+                result = checkLocation(t11, t13, t15, t15, t35, t55);
+            } else if (lastModifiedTile.equals(t22)) {
+                result = checkLocation(t22, t23, t24, t22, t32, t42);
+            } else if (lastModifiedTile.equals(t23)) {
+                result = checkLocation(t22, t23, t24, t03, t13, t23);
+            } else if (lastModifiedTile.equals(t24)) {
+                result = checkLocation(t22, t23, t24, t24, t34, t44);
+            } else if (lastModifiedTile.equals(t30)) {
+                result = checkLocation(t00, t30, t60, t30, t31, t32);
+            } else if (lastModifiedTile.equals(t31)) {
+                result = checkLocation(t30, t31, t32, t11, t31, t51);
+            } else if (lastModifiedTile.equals(t32)) {
+                result = checkLocation(t30, t31, t32, t22, t32, t42);
+            } else if (lastModifiedTile.equals(t34)) {
+                result = checkLocation(t34, t35, t36, t24, t34, t44);
+            } else if (lastModifiedTile.equals(t35)) {
+                result = checkLocation(t34, t35, t36, t15, t35, t55);
+            } else if (lastModifiedTile.equals(t36)) {
+                result = checkLocation(t34, t35, t36, t06, t36, t66);
+            } else if (lastModifiedTile.equals(t42)) {
+                result = checkLocation(t42, t43, t44, t22, t32, t42);
+            } else if (lastModifiedTile.equals(t43)) {
+                result = checkLocation(t42, t43, t44, t43, t53, t63);
+            } else if (lastModifiedTile.equals(t44)) {
+                result = checkLocation(t42, t43, t44, t24, t34, t44);
+            } else if (lastModifiedTile.equals(t51)) {
+                result = checkLocation(t51, t53, t55, t11, t31, t51);
+            } else if (lastModifiedTile.equals(t53)) {
+                result = checkLocation(t51, t53, t55, t43, t53, t63);
+            } else if (lastModifiedTile.equals(t55)) {
+                result = checkLocation(t51, t53, t55, t15, t35, t55);
+            } else if (lastModifiedTile.equals(t60)) {
+                result = checkLocation(t00, t30, t60, t60, t63, t66);
+            } else if (lastModifiedTile.equals(t63)) {
+                result = checkLocation(t60, t63, t66, t43, t53, t63);
+            } else if (lastModifiedTile.equals(t66)) {
+                result = checkLocation(t60, t63, t66, t06, t36, t66);
+            }
+        }
+
+        lastModifiedTile = null;
+
+        return result;
+    }
+
+    private boolean checkLocation(Tile t1, Tile t2, Tile t3, Tile t4, Tile t5, Tile t6) {
+        boolean merelFound = false;
+        if (gameBoard.get(t1) != null && gameBoard.get(t2) != null && gameBoard.get(t3) != null) {
+            if ((gameBoard.get(t1) == gameBoard.get(t2) && gameBoard.get(t2) == gameBoard.get(t3))) {
+                merelManager.addMerel(new Merel(t1, t2, t3));
+                merelFound = true;
+            }
+        }
+        if (gameBoard.get(t4) != null && gameBoard.get(t5) != null && gameBoard.get(t6) != null) {
+            if ((gameBoard.get(t4) == gameBoard.get(t5) && gameBoard.get(t5) == gameBoard.get(t6))) {
+                merelManager.addMerel(new Merel(t4, t5, t6));
+                merelFound = true;
+            }
+        }
+        return merelFound;
+    }
+
 }

@@ -164,14 +164,31 @@ public class GameManager {
         Tile tileToRemove = tiles.get(tileIdx--);
         board.removeTileFromHistory(tileToRemove);
         if (tileIdx == 0) {
-            Tile tileToSet = tiles.get(tileIdx);
+            Tile tileToSet = tiles.get(0);
             board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
         }
         changePlayer();
     }
 
     public void Redo() {
-        System.out.println("REDO");
+        Move moveToRedo = history.redoMove();
+        PlayerColor color = moveToRedo.getPlayerColor();
+        Boolean isTileRemoved = moveToRedo.getIsTileRemoved();
+        ArrayList<Tile> tiles = moveToRedo.getMove();
+        int tileIdx = tiles.size() - 1;
+
+        if (isTileRemoved) {
+            Tile tileToRemove = tiles.get(tileIdx--);
+            board.removeTileFromHistory(tileToRemove);
+            board.addMerelFromHistory(tiles.get(tileIdx));
+        }
+        Tile tileToSet = tiles.get(tileIdx--);
+        board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
+        if (tileIdx == 0) {
+            Tile tileToRemove = tiles.get(0);
+            board.removeTileFromHistory(tileToRemove);
+        }
+        changePlayer();
     }
 
     private void printMove(Move moveToPrint) {

@@ -386,4 +386,9 @@ public class Board {
     public void removeMerelFromHistory(Tile tile) {
         merelManager.removeMerel(tile);
     }
+
+    public void addMerelFromHistory(Tile tile) {
+        lastModifiedTile = tile;
+        checkForMerel();
+    }
 }

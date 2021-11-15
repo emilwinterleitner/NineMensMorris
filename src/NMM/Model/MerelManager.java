@@ -28,4 +28,17 @@ public class MerelManager {
 
         merels.remove(merel);
     }
+
+    public boolean isPartOfMerel(Tile tile) {
+        boolean result = false;
+
+        for (Merel m : merels) {
+            for (Tile t : m.getTiles()) {
+                if (t.equals(tile))
+                    result = true;
+            }
+        }
+
+        return result;
+    }
 }

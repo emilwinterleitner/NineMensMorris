@@ -97,7 +97,7 @@ public class GameManager {
         boolean validMove = gameManagerState.tilePressed(board, row, col, currentPlayer.getPlayerColor());
 
         if (gameManagerState instanceof GameManagerPlaceState) {
-            if (++tiles_placed > 17) {
+            if (++tiles_placed > 18) {
                 gameManagerState = new GameManagerMoveState();
                 phase = GamePhase.MOVE;
                 notifyGamePhaseChanged();
@@ -106,17 +106,14 @@ public class GameManager {
 
         if (validMove) {
             if (gameManagerState instanceof GameManagerRemoveState) {
-                System.out.println("Switching back");
                 if (phase == GamePhase.MOVE)
                     gameManagerState = new GameManagerMoveState();
                 else
                     gameManagerState = new GameManagerPlaceState();
             }
 
-            if (board.checkForMerels()) {
-                System.out.println("Merel detected");
+            if (board.checkForMerel())
                 gameManagerState = new GameManagerRemoveState();
-            }
 
             if (!(gameManagerState instanceof GameManagerRemoveState))
                 endTurn();

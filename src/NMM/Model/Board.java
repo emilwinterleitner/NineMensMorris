@@ -126,7 +126,7 @@ public class Board {
 
         PlayerColor occupiedBy = gameBoard.get(tile);
 
-        if (occupiedBy != color && occupiedBy != null) {
+        if (occupiedBy != color && occupiedBy != null && !merelManager.isPartOfMerel(tile)) {
             freeTiles.add(tile);
             gameBoard.remove(tile);
             for (TileRemovedListener trl : tileRemovedListeners) {
@@ -292,7 +292,7 @@ public class Board {
         return requestedTile;
     }
 
-    public boolean checkForMerels() {
+    public boolean checkForMerel() {
         boolean result = false;
 
         if (lastModifiedTile != null) {

@@ -1,5 +1,7 @@
 package NMM.Enums;
 
-public enum GamePhase {
+import java.io.Serializable;
+
+public enum GamePhase implements Serializable {
     PLACE, MOVE
 }

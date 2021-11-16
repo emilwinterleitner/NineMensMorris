@@ -1,6 +1,8 @@
 package NMM.Model;
 
-public class Tile {
+import java.io.Serializable;
+
+public class Tile implements Serializable {
     private final int x;
     private final int y;
 

@@ -1,9 +1,10 @@
 package NMM.Model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MerelManager {
+public class MerelManager implements Serializable {
     private List<Merel> merels;
 
     public MerelManager() {

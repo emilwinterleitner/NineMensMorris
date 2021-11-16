@@ -1,5 +1,7 @@
 package NMM.Enums;
 
-public enum PlayerColor {
+import java.io.Serializable;
+
+public enum PlayerColor implements Serializable {
     WHITE, BLACK, GREEN
 }

@@ -2,7 +2,9 @@ package NMM.Model;
 
 import NMM.Enums.PlayerColor;
 
-public class Player {
+import java.io.Serializable;
+
+public class Player implements Serializable {
     private final PlayerColor color;
     private final String name;
 

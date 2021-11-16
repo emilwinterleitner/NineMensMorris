@@ -20,9 +20,10 @@ import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Controller implements CurrentPlayerListener, TilePlacedListener, GamePhaseListener, TileSelectedListener,
-    SelectedTileChangeListener, TileRemovedListener, AllowedMovesChangedListener {
+    SelectedTileChangeListener, TileRemovedListener, AllowedMovesChangedListener, GameBoardChangedListener {
     private Board board;
     private GameManager manager;
 
@@ -70,11 +71,11 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     }
 
     public void handleSave(ActionEvent actionEvent) {
-        System.out.println("Save");
+        manager.Save();
     }
 
     public void handleLoad(ActionEvent actionEvent) {
-        System.out.println("Load");
+        manager.Load();
     }
 
     public void setGameManager(GameManager manager) {
@@ -91,6 +92,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
         board.addSelectedTileChangeListener(this);
         board.addTileRemovedListener(this);
         board.addAllowedMovesChangedListener(this);
+        board.addGameBoardChangedListener(this);
 
         btn00.setOnAction(event -> tileClicked(event.getTarget()));
         btn03.setOnAction(event -> tileClicked(event.getTarget()));
@@ -157,6 +159,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
             if (GridPane.getRowIndex(n) == y
                 && GridPane.getColumnIndex(n) == x) {
                 node = n;
+                break;
             }
         }
 
@@ -183,6 +186,19 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
                 b.setGraphic(TileFactory.getTile(PlayerColor.GREEN, false, false));
             else
                 b.setGraphic(null);
+        }
+    }
+
+    @Override
+    public void gameBoardChanged(Map<Tile, PlayerColor> gameBoard) {
+        for (Node n : boardGrid.getChildren()) {
+            Button b = (Button) n;
+            b.setGraphic(null);
+        }
+
+        for (Tile t : gameBoard.keySet()) {
+            Button b = (Button) getNode(t.getX(), t.getY());
+            b.setGraphic(TileFactory.getTile(gameBoard.get(t), false, false));
         }
     }
 }

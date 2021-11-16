@@ -10,6 +10,7 @@ import NMM.Interfaces.CurrentPlayerListener;
 import NMM.Interfaces.GamePhaseListener;
 import NMM.Model.*;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -200,5 +201,51 @@ public class GameManager {
         }
         System.out.println("");
         System.out.println("");
+    }
+
+    public void Save() {
+        history.setGameBoard(board.getGameBoard());
+        history.setMerelManager(board.getMerelManager());
+        history.setCurrentGamePhase(phase);
+        history.setPlayer1(player1);
+        history.setPlayer2(player2);
+        history.setCurrentPlayer(currentPlayer.getPlayerColor());
+        try {
+            FileOutputStream fileOut =
+                new FileOutputStream("/tmp/savegame.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(history);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in /tmp/savegame.ser");
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
+    }
+
+    public void Load() {
+        try {
+            FileInputStream fileIn = new FileInputStream("/tmp/savegame.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            history = (History) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException i) {
+            i.printStackTrace();
+            return;
+        } catch (ClassNotFoundException c) {
+            System.out.println("Employee class not found");
+            c.printStackTrace();
+            return;
+        }
+
+        board.setGameBoard(history.getGameBoard());
+        board.setMerels(history.getMerelManager());
+        phase = history.getCurrentGamePhase();
+        player1 = history.getPlayer1();
+        player2 = history.getPlayer2();
+        currentPlayer = player1.getPlayerColor() == history.getCurrentPlayer() ? player1 : player2;
+        notifyGamePhaseChanged();
+        notifyPlayerChanged();
     }
 }

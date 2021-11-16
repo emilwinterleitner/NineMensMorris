@@ -2,9 +2,10 @@ package NMM.Model;
 
 import NMM.Enums.PlayerColor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Move {
+public class Move implements Serializable {
     private final PlayerColor player;
     private ArrayList<Tile> move;
 

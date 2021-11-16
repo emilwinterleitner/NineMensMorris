@@ -51,6 +51,7 @@ public class Board {
     private List<SelectedTileChangeListener> selectedTileChangeListeners = new ArrayList<>();
     private List<TileRemovedListener> tileRemovedListeners = new ArrayList<>();
     private List<AllowedMovesChangedListener> allowedMovesChangedListeners = new ArrayList<>();
+    private List<GameBoardChangedListener> gameBoardChangedListeners = new ArrayList<>();
 
     private Board() {
         allTiles = new ArrayList<>();
@@ -102,6 +103,7 @@ public class Board {
     public void addSelectedTileChangeListener(SelectedTileChangeListener listener) { selectedTileChangeListeners.add(listener); }
     public void addTileRemovedListener(TileRemovedListener listener) { tileRemovedListeners.add(listener); }
     public void addAllowedMovesChangedListener(AllowedMovesChangedListener listener) { allowedMovesChangedListeners.add(listener); }
+    public void addGameBoardChangedListener(GameBoardChangedListener listener) { gameBoardChangedListeners.add(listener); }
 
     public boolean tryToSelectTile(int row, int col, PlayerColor playerColor) {
         boolean result = false;
@@ -390,5 +392,24 @@ public class Board {
     public void addMerelFromHistory(Tile tile) {
         lastModifiedTile = tile;
         checkForMerel();
+    }
+
+    public Map<Tile, PlayerColor> getGameBoard() {
+        return gameBoard;
+    }
+
+    public MerelManager getMerelManager() {
+        return merelManager;
+    }
+
+    public void setGameBoard(Map<Tile, PlayerColor> gameBoard) {
+        this.gameBoard = gameBoard;
+        for (GameBoardChangedListener gcl : gameBoardChangedListeners) {
+            gcl.gameBoardChanged(gameBoard);
+        }
+    }
+
+    public void setMerels(MerelManager merelManager) {
+        this.merelManager = merelManager;
     }
 }

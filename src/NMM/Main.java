@@ -22,10 +22,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
         primaryStage.show();
-
-        Player p1 = new Player(PlayerColor.WHITE, "Player 1");
-        Player p2 = new Player(PlayerColor.BLACK, "Player 2");
-        manager = new GameManager(p1, p2, GamePhase.PLACE, null);
+        manager = new GameManager();
 
         controller = loader.getController();
         controller.setGameManager(manager);

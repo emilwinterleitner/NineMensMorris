@@ -35,28 +35,10 @@ public class GameManager {
 
     private int tiles_placed;
 
-    public GameManager(Player p1, Player p2, GamePhase phase, History hist) {
+    public GameManager() {
         board = Board.getInstance();
 
-        player1 = p1;
-        player2 = p2;
-
-        tiles_placed = 0;
-
-        gameManagerState = new GameManagerPlaceState();
-
-        if (hist != null)
-            history = hist;
-        else
-            history = new History();
-    }
-
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public Player getOpponentPlayer() {
-        return opponentPlayer;
+        board.reset();
     }
 
     public void addCurrentPlayerListener(CurrentPlayerListener listener) {
@@ -65,14 +47,6 @@ public class GameManager {
 
     public void addGamePhaseListener(GamePhaseListener listener) {
         gamePhaseListeners.add(listener);
-    }
-
-    public Board getBoard() {
-        return board;
-    }
-
-    public GamePhase getPhase() {
-        return phase;
     }
 
     private void changePlayer() {
@@ -91,6 +65,14 @@ public class GameManager {
     }
 
     public void startGame() {
+        player1 = new Player(PlayerColor.WHITE, "Player 1");
+        player2 = new Player(PlayerColor.BLACK, "Player 2");
+
+        tiles_placed = 0;
+
+        gameManagerState = new GameManagerPlaceState();
+
+        history = new History();
         currentPlayer = player1;
         phase = GamePhase.PLACE;
         notifyPlayerChanged();
@@ -108,6 +90,7 @@ public class GameManager {
             move.addTile(board.getTile(row, col));
 
             if (gameManagerState instanceof GameManagerPlaceState) {
+                currentPlayer.addTile();
                 System.out.println("Placed: " + ++tiles_placed);
                 if (tiles_placed > 17) {
                     gameManagerState = new GameManagerMoveState();
@@ -117,15 +100,23 @@ public class GameManager {
             }
 
             if (gameManagerState instanceof GameManagerRemoveState) {
+                opponentPlayer.removeTile();
                 move.setIsTileRemoved();
-                if (phase == GamePhase.MOVE)
+                if (tiles_placed > 17) {
                     gameManagerState = new GameManagerMoveState();
-                else
+                    phase = GamePhase.MOVE;
+                } else {
                     gameManagerState = new GameManagerPlaceState();
+                    phase = GamePhase.PLACE;
+                }
+                notifyGamePhaseChanged();
             }
 
-            if (board.checkForMerel())
+            if (board.checkForMerel()) {
                 gameManagerState = new GameManagerRemoveState();
+                phase = GamePhase.REMOVE;
+                notifyGamePhaseChanged();
+            }
 
             if (!(gameManagerState instanceof GameManagerRemoveState))
                 endTurn();
@@ -134,6 +125,8 @@ public class GameManager {
 
     private void endTurn() {
         history.addMove(move);
+        System.out.println("Player 1 has currently: " + player1.getTilesOnBoard() + " chips");
+        System.out.println("Player 2 has currently: " + player2.getTilesOnBoard() + " chips");
         changePlayer();
     }
 
@@ -157,10 +150,9 @@ public class GameManager {
             ArrayList<Tile> tiles = moveToUndo.getMove();
             int tileIdx = tiles.size() - 1;
 
-            printMove(moveToUndo);
-
             if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
                 tiles_placed--;
+                currentPlayer.removeTile();
                 if (phase == GamePhase.MOVE) {
                     gameManagerState = new GameManagerPlaceState();
                     phase = GamePhase.PLACE;
@@ -173,6 +165,7 @@ public class GameManager {
                 board.tryToSetTile(tileToSet.getY(), tileToSet.getX(),
                     color == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE);
                 board.removeMerelFromHistory(tiles.get(tileIdx));
+                opponentPlayer.addTile();
             }
             Tile tileToRemove = tiles.get(tileIdx--);
             board.removeTileFromHistory(tileToRemove);
@@ -193,10 +186,9 @@ public class GameManager {
             ArrayList<Tile> tiles = moveToRedo.getMove();
             int tileIdx = tiles.size() - 1;
 
-            printMove(moveToRedo);
-
             if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
                 if (phase == GamePhase.PLACE) {
+                    currentPlayer.addTile();
                     if (++tiles_placed > 17) {
                         gameManagerState = new GameManagerMoveState();
                         phase = GamePhase.MOVE;
@@ -209,6 +201,7 @@ public class GameManager {
                 Tile tileToRemove = tiles.get(tileIdx--);
                 board.removeTileFromHistory(tileToRemove);
                 board.addMerelFromHistory(tiles.get(tileIdx));
+                opponentPlayer.removeTile();
             }
             Tile tileToSet = tiles.get(tileIdx--);
             board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
@@ -220,6 +213,7 @@ public class GameManager {
         }
     }
 
+    // Only for debug
     private void printMove(Move moveToPrint) {
         System.out.println("Played By: " + moveToPrint.getPlayerColor());
         System.out.println("Removed Tile: " + moveToPrint.getIsTileRemoved());
@@ -238,6 +232,7 @@ public class GameManager {
         history.setPlayer1(player1);
         history.setPlayer2(player2);
         history.setCurrentPlayer(currentPlayer.getPlayerColor());
+
         try {
             FileOutputStream fileOut =
                 new FileOutputStream("/tmp/savegame.ser");
@@ -258,12 +253,8 @@ public class GameManager {
             history = (History) in.readObject();
             in.close();
             fileIn.close();
-        } catch (IOException i) {
+        } catch (IOException | ClassNotFoundException i) {
             i.printStackTrace();
-            return;
-        } catch (ClassNotFoundException c) {
-            System.out.println("Employee class not found");
-            c.printStackTrace();
             return;
         }
 
@@ -275,5 +266,12 @@ public class GameManager {
         currentPlayer = player1.getPlayerColor() == history.getCurrentPlayer() ? player1 : player2;
         notifyGamePhaseChanged();
         notifyPlayerChanged();
+
+        if (phase == GamePhase.PLACE)
+            gameManagerState = new GameManagerPlaceState();
+        else
+            gameManagerState = new GameManagerMoveState();
+
+        move = new Move(currentPlayer.getPlayerColor());
     }
 }

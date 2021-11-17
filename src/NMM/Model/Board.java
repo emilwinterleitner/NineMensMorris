@@ -54,16 +54,7 @@ public class Board {
     private List<GameBoardChangedListener> gameBoardChangedListeners = new ArrayList<>();
 
     private Board() {
-        allTiles = new ArrayList<>();
-        allTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
-            t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
-        freeTiles = new ArrayList<>();
-        freeTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
-            t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
-
-        gameBoard = new HashMap<>();
-        allowedMoves = new ArrayList<>();
-        merelManager = new MerelManager();
+        reset();
     }
 
     public static Board getInstance() {
@@ -411,5 +402,18 @@ public class Board {
 
     public void setMerels(MerelManager merelManager) {
         this.merelManager = merelManager;
+    }
+
+    public void reset() {
+        allTiles = new ArrayList<>();
+        allTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
+            t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
+        freeTiles = new ArrayList<>();
+        freeTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
+            t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
+
+        gameBoard = new HashMap<>();
+        allowedMoves = new ArrayList<>();
+        merelManager = new MerelManager();
     }
 }

@@ -108,7 +108,8 @@ public class GameManager {
             move.addTile(board.getTile(row, col));
 
             if (gameManagerState instanceof GameManagerPlaceState) {
-                if (++tiles_placed > 18) {
+                System.out.println("Placed: " + ++tiles_placed);
+                if (tiles_placed > 17) {
                     gameManagerState = new GameManagerMoveState();
                     phase = GamePhase.MOVE;
                     notifyGamePhaseChanged();
@@ -149,47 +150,74 @@ public class GameManager {
 
     public void Undo() {
         Move moveToUndo = history.undoMove();
-        PlayerColor color = moveToUndo.getPlayerColor();
-        Boolean isTileRemoved = moveToUndo.getIsTileRemoved();
-        ArrayList<Tile> tiles = moveToUndo.getMove();
-        int tileIdx = tiles.size() - 1;
 
-        printMove(moveToUndo);
+        if (moveToUndo != null) {
+            PlayerColor color = moveToUndo.getPlayerColor();
+            Boolean isTileRemoved = moveToUndo.getIsTileRemoved();
+            ArrayList<Tile> tiles = moveToUndo.getMove();
+            int tileIdx = tiles.size() - 1;
 
-        if (isTileRemoved) {
-            Tile tileToSet = tiles.get(tileIdx--);
-            board.tryToSetTile(tileToSet.getY(), tileToSet.getX(),
-                color == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE);
-            board.removeMerelFromHistory(tiles.get(tileIdx));
+            printMove(moveToUndo);
+
+            if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
+                tiles_placed--;
+                if (phase == GamePhase.MOVE) {
+                    gameManagerState = new GameManagerPlaceState();
+                    phase = GamePhase.PLACE;
+                    notifyGamePhaseChanged();
+                }
+            }
+
+            if (isTileRemoved) {
+                Tile tileToSet = tiles.get(tileIdx--);
+                board.tryToSetTile(tileToSet.getY(), tileToSet.getX(),
+                    color == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE);
+                board.removeMerelFromHistory(tiles.get(tileIdx));
+            }
+            Tile tileToRemove = tiles.get(tileIdx--);
+            board.removeTileFromHistory(tileToRemove);
+            if (tileIdx == 0) {
+                Tile tileToSet = tiles.get(0);
+                board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
+            }
+            changePlayer();
         }
-        Tile tileToRemove = tiles.get(tileIdx--);
-        board.removeTileFromHistory(tileToRemove);
-        if (tileIdx == 0) {
-            Tile tileToSet = tiles.get(0);
-            board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
-        }
-        changePlayer();
     }
 
     public void Redo() {
         Move moveToRedo = history.redoMove();
-        PlayerColor color = moveToRedo.getPlayerColor();
-        Boolean isTileRemoved = moveToRedo.getIsTileRemoved();
-        ArrayList<Tile> tiles = moveToRedo.getMove();
-        int tileIdx = tiles.size() - 1;
 
-        if (isTileRemoved) {
-            Tile tileToRemove = tiles.get(tileIdx--);
-            board.removeTileFromHistory(tileToRemove);
-            board.addMerelFromHistory(tiles.get(tileIdx));
+        if (moveToRedo != null) {
+            PlayerColor color = moveToRedo.getPlayerColor();
+            Boolean isTileRemoved = moveToRedo.getIsTileRemoved();
+            ArrayList<Tile> tiles = moveToRedo.getMove();
+            int tileIdx = tiles.size() - 1;
+
+            printMove(moveToRedo);
+
+            if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
+                if (phase == GamePhase.PLACE) {
+                    if (++tiles_placed > 17) {
+                        gameManagerState = new GameManagerMoveState();
+                        phase = GamePhase.MOVE;
+                        notifyGamePhaseChanged();
+                    }
+                }
+            }
+
+            if (isTileRemoved) {
+                Tile tileToRemove = tiles.get(tileIdx--);
+                board.removeTileFromHistory(tileToRemove);
+                board.addMerelFromHistory(tiles.get(tileIdx));
+            }
+            Tile tileToSet = tiles.get(tileIdx--);
+            board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
+            if (tileIdx == 0) {
+                Tile tileToRemove = tiles.get(0);
+                board.removeTileFromHistory(tileToRemove);
+            }
+            changePlayer();
         }
-        Tile tileToSet = tiles.get(tileIdx--);
-        board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
-        if (tileIdx == 0) {
-            Tile tileToRemove = tiles.get(0);
-            board.removeTileFromHistory(tileToRemove);
-        }
-        changePlayer();
     }
 
     private void printMove(Move moveToPrint) {

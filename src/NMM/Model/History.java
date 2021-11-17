@@ -32,13 +32,21 @@ public class History implements Serializable {
     }
 
     public Move undoMove() {
-        currentIndex = Math.max(currentIndex, 0);
-        return history.get(currentIndex--);
+        Move move = null;
+
+        if (currentIndex >= 0)
+            move = history.get(currentIndex--);
+
+        return move;
     }
 
     public Move redoMove() {
-        currentIndex = currentIndex >= history.size() - 1 ? history.size() - 2 : currentIndex;
-        return history.get(++currentIndex);
+        Move move = null;
+
+        if (currentIndex <= history.size() - 2)
+            move = history.get(++currentIndex);
+
+        return move;
     }
 
     public Map<Tile, PlayerColor> getGameBoard() {

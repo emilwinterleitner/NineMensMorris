@@ -20,57 +20,28 @@ public class GameManager {
     private Player player2;
     private Player currentPlayer;
     private Player opponentPlayer;
-
+    private GamePhase phase;
+    private History history;
+    private Board board;
     private Move move;
 
     private List<CurrentPlayerListener> currentPlayerListeners = new ArrayList<CurrentPlayerListener>();
-
     private List<GamePhaseListener> gamePhaseListeners = new ArrayList<GamePhaseListener>();
 
-    private Board board;
-
-    private GamePhase phase;
-
-    private History history;
-
-    private int tiles_placed;
+    private int tilesPlaced;
 
     public GameManager() {
         board = Board.getInstance();
-
         board.reset();
     }
 
-    public void addCurrentPlayerListener(CurrentPlayerListener listener) {
-        currentPlayerListeners.add(listener);
-    }
-    public void addGamePhaseListener(GamePhaseListener listener) {
-        gamePhaseListeners.add(listener);
-    }
-
-    public void removeCurrentPlayerListener(CurrentPlayerListener listener) { currentPlayerListeners.remove(listener); }
-    public void removeGamePhaseListener(GamePhaseListener listener) { gamePhaseListeners.remove(listener); }
-
-    private void changePlayer() {
-        if (currentPlayer == player1) {
-            currentPlayer = player2;
-            opponentPlayer = player1;
-        } else {
-            currentPlayer = player1;
-            opponentPlayer = player2;
-        }
-
-        for (CurrentPlayerListener cpl : currentPlayerListeners)
-            cpl.playerChanged(currentPlayer);
-
-        move = new Move(currentPlayer.getPlayerColor());
-    }
+    //region Game Flow
 
     public void startGame() {
         player1 = new Player(PlayerColor.WHITE, "Player 1");
         player2 = new Player(PlayerColor.BLACK, "Player 2");
 
-        tiles_placed = 0;
+        tilesPlaced = 0;
 
         gameManagerState = new GameManagerPlaceState();
 
@@ -93,7 +64,7 @@ public class GameManager {
 
             if (gameManagerState instanceof GameManagerPlaceState) {
                 currentPlayer.addTile();
-                if (tiles_placed > 17) {
+                if (++tilesPlaced > 17) {
                     gameManagerState = new GameManagerMoveState();
                     phase = GamePhase.MOVE;
                     notifyGamePhaseChanged();
@@ -103,7 +74,7 @@ public class GameManager {
             if (gameManagerState instanceof GameManagerRemoveState) {
                 opponentPlayer.removeTile();
                 move.setIsTileRemoved();
-                if (tiles_placed > 17) {
+                if (tilesPlaced > 17) {
                     gameManagerState = new GameManagerMoveState();
                     phase = GamePhase.MOVE;
                 } else {
@@ -129,20 +100,43 @@ public class GameManager {
         changePlayer();
     }
 
-    private void notifyPlayerChanged() {
+    private void changePlayer() {
+        if (currentPlayer == player1) {
+            currentPlayer = player2;
+            opponentPlayer = player1;
+        } else {
+            currentPlayer = player1;
+            opponentPlayer = player2;
+        }
+
         for (CurrentPlayerListener cpl : currentPlayerListeners)
             cpl.playerChanged(currentPlayer);
+
+        move = new Move(currentPlayer.getPlayerColor());
     }
 
-    private void notifyGamePhaseChanged() {
-        for (GamePhaseListener gpl : gamePhaseListeners) {
-            gpl.gamePhaseChanged(phase);
-        }
-    }
+    //endregion
+
+    //region Undo / Redo
 
     public void Undo() {
-        Move moveToUndo = history.undoMove();
+        Move moveToUndo = null;
 
+        if (phase == GamePhase.REMOVE) {
+            moveToUndo = move;
+            changePlayer();
+            if (tilesPlaced > 17) {
+                gameManagerState = new GameManagerMoveState();
+                phase = GamePhase.MOVE;
+                notifyGamePhaseChanged();
+            } else {
+                gameManagerState = new GameManagerPlaceState();
+                phase = GamePhase.PLACE;
+                notifyGamePhaseChanged();
+            }
+        } else {
+            moveToUndo = history.undoMove();
+        }
         if (moveToUndo != null) {
             PlayerColor color = moveToUndo.getPlayerColor();
             Boolean isTileRemoved = moveToUndo.getIsTileRemoved();
@@ -150,7 +144,7 @@ public class GameManager {
             int tileIdx = tiles.size() - 1;
 
             if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
-                tiles_placed--;
+                tilesPlaced--;
                 currentPlayer.removeTile();
                 if (phase == GamePhase.MOVE) {
                     gameManagerState = new GameManagerPlaceState();
@@ -188,7 +182,7 @@ public class GameManager {
             if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
                 if (phase == GamePhase.PLACE) {
                     currentPlayer.addTile();
-                    if (++tiles_placed > 17) {
+                    if (++tilesPlaced > 17) {
                         gameManagerState = new GameManagerMoveState();
                         phase = GamePhase.MOVE;
                         notifyGamePhaseChanged();
@@ -212,7 +206,88 @@ public class GameManager {
         }
     }
 
-    // Only for debug
+    //endregion
+
+    //region Load / Save
+
+    public void Load() {
+        try {
+            FileInputStream fileIn = new FileInputStream("/tmp/savegame.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            history = (History) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        board.setGameBoard(history.getGameBoard());
+        board.setMerels(history.getMerelManager());
+        phase = history.getCurrentGamePhase();
+        player1 = history.getPlayer1();
+        player2 = history.getPlayer2();
+        currentPlayer = player1.getPlayerColor() == history.getCurrentPlayer() ? player1 : player2;
+        tilesPlaced = history.getTilesPlaced();
+        notifyGamePhaseChanged();
+        notifyPlayerChanged();
+
+        if (phase == GamePhase.PLACE)
+            gameManagerState = new GameManagerPlaceState();
+        else
+            gameManagerState = new GameManagerMoveState();
+
+        move = new Move(currentPlayer.getPlayerColor());
+    }
+
+    public void Save() {
+        if (phase != GamePhase.REMOVE) {
+            history.setGameBoard(board.getGameBoard());
+            history.setMerelManager(board.getMerelManager());
+            history.setCurrentGamePhase(phase);
+            history.setPlayer1(player1);
+            history.setPlayer2(player2);
+            history.setCurrentPlayer(currentPlayer.getPlayerColor());
+            history.setTilesPlaced(tilesPlaced);
+
+            try {
+                FileOutputStream fileOut =
+                    new FileOutputStream("/tmp/savegame.ser");
+                ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                out.writeObject(history);
+                out.close();
+                fileOut.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //endregion
+
+    //region Listeners
+
+    public void addCurrentPlayerListener(CurrentPlayerListener listener) { currentPlayerListeners.add(listener); }
+    public void addGamePhaseListener(GamePhaseListener listener) { gamePhaseListeners.add(listener); }
+
+    public void removeCurrentPlayerListener(CurrentPlayerListener listener) { currentPlayerListeners.remove(listener); }
+    public void removeGamePhaseListener(GamePhaseListener listener) { gamePhaseListeners.remove(listener); }
+
+    private void notifyPlayerChanged() {
+        for (CurrentPlayerListener cpl : currentPlayerListeners)
+            cpl.playerChanged(currentPlayer);
+    }
+
+    private void notifyGamePhaseChanged() {
+        for (GamePhaseListener gpl : gamePhaseListeners) {
+            gpl.gamePhaseChanged(phase);
+        }
+    }
+
+    //endregion
+
+    //region Debug
+
     private void printMove(Move moveToPrint) {
         System.out.println("Played By: " + moveToPrint.getPlayerColor());
         System.out.println("Removed Tile: " + moveToPrint.getIsTileRemoved());
@@ -224,52 +299,5 @@ public class GameManager {
         System.out.println("");
     }
 
-    public void Save() {
-        history.setGameBoard(board.getGameBoard());
-        history.setMerelManager(board.getMerelManager());
-        history.setCurrentGamePhase(phase);
-        history.setPlayer1(player1);
-        history.setPlayer2(player2);
-        history.setCurrentPlayer(currentPlayer.getPlayerColor());
-
-        try {
-            FileOutputStream fileOut =
-                new FileOutputStream("/tmp/savegame.ser");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(history);
-            out.close();
-            fileOut.close();
-        } catch (IOException i) {
-            i.printStackTrace();
-        }
-    }
-
-    public void Load() {
-        try {
-            FileInputStream fileIn = new FileInputStream("/tmp/savegame.ser");
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            history = (History) in.readObject();
-            in.close();
-            fileIn.close();
-        } catch (IOException | ClassNotFoundException i) {
-            i.printStackTrace();
-            return;
-        }
-
-        board.setGameBoard(history.getGameBoard());
-        board.setMerels(history.getMerelManager());
-        phase = history.getCurrentGamePhase();
-        player1 = history.getPlayer1();
-        player2 = history.getPlayer2();
-        currentPlayer = player1.getPlayerColor() == history.getCurrentPlayer() ? player1 : player2;
-        notifyGamePhaseChanged();
-        notifyPlayerChanged();
-
-        if (phase == GamePhase.PLACE)
-            gameManagerState = new GameManagerPlaceState();
-        else
-            gameManagerState = new GameManagerMoveState();
-
-        move = new Move(currentPlayer.getPlayerColor());
-    }
+    //endregion
 }

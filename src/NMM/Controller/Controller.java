@@ -74,7 +74,7 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     }
 
     public void handleLoad(ActionEvent actionEvent) {
-        manager = new GameManager();
+        setGameManager(new GameManager());
         manager.Load();
     }
 

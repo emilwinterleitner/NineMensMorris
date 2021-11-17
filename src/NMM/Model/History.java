@@ -4,19 +4,21 @@ import NMM.Enums.GamePhase;
 import NMM.Enums.PlayerColor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class History implements Serializable {
     private List<Move> history;
-
     private Map<Tile, PlayerColor> gameBoard;
     private MerelManager merelManager;
     private GamePhase currentGamePhase;
     private Player player1;
     private Player player2;
     private PlayerColor currentPlayer;
+
+    private int tilesPlaced;
 
     private int currentIndex = -1;
 
@@ -26,7 +28,7 @@ public class History implements Serializable {
 
     public void addMove(Move move) {
         if (currentIndex != history.size() - 1)
-            history = history.subList(0, currentIndex + 1);
+            history = new LinkedList<>(history.subList(0, currentIndex + 1));
         history.add(move);
         currentIndex = history.size() - 1;
     }
@@ -89,11 +91,11 @@ public class History implements Serializable {
         this.player2 = player2;
     }
 
-    public PlayerColor getCurrentPlayer() {
-        return currentPlayer;
-    }
+    public PlayerColor getCurrentPlayer() { return currentPlayer; }
 
-    public void setCurrentPlayer(PlayerColor currentPlayer) {
-        this.currentPlayer = currentPlayer;
-    }
+    public void setCurrentPlayer(PlayerColor currentPlayer) { this.currentPlayer = currentPlayer; }
+
+    public int getTilesPlaced() { return tilesPlaced; }
+
+    public void setTilesPlaced(int tilesPlaced) { this.tilesPlaced = tilesPlaced; }
 }

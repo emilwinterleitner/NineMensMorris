@@ -27,8 +27,6 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     private Board board;
     private GameManager manager;
 
-    private ObservableList<Button> gameBoard = FXCollections.observableArrayList();
-
     @FXML
     private GridPane boardGrid;
     @FXML
@@ -64,10 +62,11 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     @FXML Button btn63;
     @FXML Button btn66;
 
-    private GridPane pane;
-
     public void handleNewGame(ActionEvent actionEvent) {
-        System.out.println("New Game");
+        resetGameBoard();
+        setGameManager(new GameManager());
+        manager.startGame();
+        System.out.println("new game");
     }
 
     public void handleSave(ActionEvent actionEvent) {
@@ -80,9 +79,15 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     }
 
     public void setGameManager(GameManager manager) {
-        this.manager = manager;
-        manager.addCurrentPlayerListener(this);
-        manager.addGamePhaseListener(this);
+        if (manager != null) {
+            if (this.manager != null) {
+                manager.removeCurrentPlayerListener(this);
+                manager.removeGamePhaseListener(this);
+            }
+            this.manager = manager;
+            manager.addCurrentPlayerListener(this);
+            manager.addGamePhaseListener(this);
+        }
     }
 
     @FXML
@@ -192,14 +197,18 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
 
     @Override
     public void gameBoardChanged(Map<Tile, PlayerColor> gameBoard) {
-        for (Node n : boardGrid.getChildren()) {
-            Button b = (Button) n;
-            b.setGraphic(null);
-        }
+        resetGameBoard();
 
         for (Tile t : gameBoard.keySet()) {
             Button b = (Button) getNode(t.getX(), t.getY());
             b.setGraphic(TileFactory.getTile(gameBoard.get(t), false, false));
+        }
+    }
+
+    public void resetGameBoard() {
+        for (Node n : boardGrid.getChildren()) {
+            Button b = (Button) n;
+            b.setGraphic(null);
         }
     }
 }

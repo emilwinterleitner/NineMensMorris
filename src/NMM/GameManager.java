@@ -44,10 +44,12 @@ public class GameManager {
     public void addCurrentPlayerListener(CurrentPlayerListener listener) {
         currentPlayerListeners.add(listener);
     }
-
     public void addGamePhaseListener(GamePhaseListener listener) {
         gamePhaseListeners.add(listener);
     }
+
+    public void removeCurrentPlayerListener(CurrentPlayerListener listener) { currentPlayerListeners.remove(listener); }
+    public void removeGamePhaseListener(GamePhaseListener listener) { gamePhaseListeners.remove(listener); }
 
     private void changePlayer() {
         if (currentPlayer == player1) {
@@ -91,7 +93,6 @@ public class GameManager {
 
             if (gameManagerState instanceof GameManagerPlaceState) {
                 currentPlayer.addTile();
-                System.out.println("Placed: " + ++tiles_placed);
                 if (tiles_placed > 17) {
                     gameManagerState = new GameManagerMoveState();
                     phase = GamePhase.MOVE;
@@ -125,8 +126,6 @@ public class GameManager {
 
     private void endTurn() {
         history.addMove(move);
-        System.out.println("Player 1 has currently: " + player1.getTilesOnBoard() + " chips");
-        System.out.println("Player 2 has currently: " + player2.getTilesOnBoard() + " chips");
         changePlayer();
     }
 
@@ -240,7 +239,6 @@ public class GameManager {
             out.writeObject(history);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data is saved in /tmp/savegame.ser");
         } catch (IOException i) {
             i.printStackTrace();
         }

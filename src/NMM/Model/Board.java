@@ -405,6 +405,7 @@ public class Board {
     }
 
     public void reset() {
+
         allTiles = new ArrayList<>();
         allTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
             t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));

@@ -95,6 +95,7 @@ public class GameManager {
         }
     }
 
+    // Game is won if a player has less than 3 figures left
     private boolean checkAndHandleGameWon() {
         boolean won = false;
 

@@ -44,6 +44,7 @@ public class GameManager {
 
         history = new History();
         currentPlayer = player1;
+        opponentPlayer = player2;
         phase = GamePhase.PLACE;
         notifyPlayerChanged();
         notifyGamePhaseChanged();
@@ -54,25 +55,31 @@ public class GameManager {
         boolean validMove = gameManagerState.tilePressed(board, row, col, currentPlayer.getPlayerColor());
 
         if (validMove) {
-            if (gameManagerState instanceof GameManagerMoveState)
-                move.addTile(board.getOriginTile());
-
-            move.addTile(board.getTile(row, col));
-
+            // Handle phase 1 (Place)
             if (gameManagerState instanceof GameManagerPlaceState) {
-                currentPlayer.addTile();
                 if (++tilesPlaced > 17) {
                     gameManagerState = new GameManagerMoveState();
                     phase = GamePhase.MOVE;
                     notifyGamePhaseChanged();
                 }
+            } else if (gameManagerState instanceof GameManagerMoveState) {
+                // Handle phase 2 (Move)
+                // add selected (origin) tile to history
+                move.addTile(board.getOriginTile());
+                currentPlayer.removeTile(board.getOriginTile());
             }
+            // add destination tile to history
+            Tile t = board.getTile(row, col);
+            move.addTile(t);
 
+            // Handle removing of opponent tiles
             if (gameManagerState instanceof GameManagerRemoveState) {
-                opponentPlayer.removeTile();
+                opponentPlayer.removeTile(board.getTile(row, col));
                 move.setIsTileRemoved();
 
+                // Check if the opponent player still has enough figures left
                 if (!checkAndHandleGameWon()) {
+                    // return to old state
                     if (tilesPlaced > 17) {
                         gameManagerState = new GameManagerMoveState();
                         phase = GamePhase.MOVE;
@@ -83,6 +90,7 @@ public class GameManager {
                 }
                 notifyGamePhaseChanged();
             } else {
+                currentPlayer.addTile(t);
                 if (board.checkForMerel()) {
                     gameManagerState = new GameManagerRemoveState();
                     phase = GamePhase.REMOVE;
@@ -99,7 +107,7 @@ public class GameManager {
     private boolean checkAndHandleGameWon() {
         boolean won = false;
 
-        if (opponentPlayer.getTilesOnBoard() < 3 && tilesPlaced > 17) {
+        if (opponentPlayer.getTilesOnBoardCount() < 3 && tilesPlaced > 17) {
             gameManagerState = new GameManagerWonState();
             phase = GamePhase.WON;
             won = true;
@@ -110,8 +118,21 @@ public class GameManager {
 
     private void endTurn() {
         history.addMove(move);
+        if (!(gameManagerState instanceof GameManagerPlaceState || gameManagerState instanceof GameManagerWonState)) {
+            if (!checkIfOpponentCanMove()) {
+                gameManagerState = new GameManagerWonState();
+                phase = GamePhase.WON;
+                notifyGamePhaseChanged();
+            }
+        }
         if (!(gameManagerState instanceof GameManagerWonState))
             changePlayer();
+    }
+
+    private boolean checkIfOpponentCanMove() {
+        List<Tile> tiles = opponentPlayer.getTilesOnBoard();
+        System.out.println("Opponent has " + board.getAllowedMovesCount(tiles) + " possible moves");
+        return board.getAllowedMovesCount(tiles) > 0;
     }
 
     private void changePlayer() {
@@ -127,6 +148,8 @@ public class GameManager {
             cpl.playerChanged(currentPlayer);
 
         move = new Move(currentPlayer.getPlayerColor());
+
+        //board.printMap();
     }
 
     //endregion
@@ -135,6 +158,9 @@ public class GameManager {
 
     public void Undo() {
         Move moveToUndo = null;
+        PlayerColor color;
+        Player player;
+        Player opponent;
 
         // Handle special case that the winning move is reverted
         if (phase == GamePhase.WON) {
@@ -144,30 +170,36 @@ public class GameManager {
             changePlayer();
         }
 
+        // If undo is pressed during an unfinished move
         if (phase == GamePhase.REMOVE) {
             moveToUndo = move;
+            color = moveToUndo.getPlayerColor();
+            player = color == player1.getPlayerColor() ? player1 : player2;
+            opponent = color == player1.getPlayerColor() ? player2 : player1;
             changePlayer();
             if (tilesPlaced > 17) {
                 gameManagerState = new GameManagerMoveState();
                 phase = GamePhase.MOVE;
-                notifyGamePhaseChanged();
             } else {
                 gameManagerState = new GameManagerPlaceState();
                 phase = GamePhase.PLACE;
-                notifyGamePhaseChanged();
             }
+            notifyGamePhaseChanged();
         } else {
             moveToUndo = history.undoMove();
+            color = moveToUndo.getPlayerColor();
+            player = color == player1.getPlayerColor() ? player1 : player2;
+            opponent = color == player1.getPlayerColor() ? player2 : player1;
         }
+
         if (moveToUndo != null) {
-            PlayerColor color = moveToUndo.getPlayerColor();
-            Boolean isTileRemoved = moveToUndo.getIsTileRemoved();
+            boolean isTileRemoved = moveToUndo.getIsTileRemoved();
             ArrayList<Tile> tiles = moveToUndo.getMove();
             int tileIdx = tiles.size() - 1;
 
+            // Check if phase has to be updated (transition phase 1 to 2)
             if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
                 tilesPlaced--;
-                opponentPlayer.removeTile();
                 if (phase == GamePhase.MOVE) {
                     gameManagerState = new GameManagerPlaceState();
                     phase = GamePhase.PLACE;
@@ -175,19 +207,28 @@ public class GameManager {
                 }
             }
 
+            // If a tile has been removed, re-add it
             if (isTileRemoved) {
                 Tile tileToSet = tiles.get(tileIdx--);
                 board.tryToSetTile(tileToSet.getY(), tileToSet.getX(),
                     color == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE);
                 board.removeMerelFromHistory(tiles.get(tileIdx));
-                currentPlayer.addTile();
+                opponent.addTile(tileToSet);
             }
+
+            // This tile for sure has to be removed no matter if phase 1 or 2
             Tile tileToRemove = tiles.get(tileIdx--);
+            board.removeMerelFromHistory(tileToRemove);
             board.removeTileFromHistory(tileToRemove);
+            player.removeTile(tileToRemove);
+
+            // If a tile is left then this move occurred in phase 2 -> origin tile has to be set
             if (tileIdx == 0) {
                 Tile tileToSet = tiles.get(0);
                 board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
+                player.addTile(tileToSet);
             }
+
             changePlayer();
         }
     }
@@ -197,35 +238,48 @@ public class GameManager {
 
         if (moveToRedo != null) {
             PlayerColor color = moveToRedo.getPlayerColor();
-            Boolean isTileRemoved = moveToRedo.getIsTileRemoved();
+            Player player = color == player1.getPlayerColor() ? player1 : player2;
+            Player opponent = color == player1.getPlayerColor() ? player2 : player1;
+            boolean isTileRemoved = moveToRedo.getIsTileRemoved();
             ArrayList<Tile> tiles = moveToRedo.getMove();
             int tileIdx = tiles.size() - 1;
 
+            // Check if phase has to be updated (transition from phase 1 to 2)
             if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
-                if (phase == GamePhase.PLACE) {
-                    currentPlayer.addTile();
-                    if (++tilesPlaced > 17) {
-                        gameManagerState = new GameManagerMoveState();
-                        phase = GamePhase.MOVE;
-                        notifyGamePhaseChanged();
-                    }
+                if (++tilesPlaced > 17) {
+                    gameManagerState = new GameManagerMoveState();
+                    phase = GamePhase.MOVE;
+                    notifyGamePhaseChanged();
                 }
             }
 
+            // If a tile has been removed, remove it
             if (isTileRemoved) {
                 Tile tileToRemove = tiles.get(tileIdx--);
                 board.removeTileFromHistory(tileToRemove);
-                board.addMerelFromHistory(tiles.get(tileIdx));
-                opponentPlayer.removeTile();
+                opponent.removeTile(tileToRemove);
+            }
+
+            // This tile for sure has to be set no matter which phase
+            Tile tileToSet = tiles.get(tileIdx--);
+            board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
+            player.addTile(tileToSet);
+
+            // If a move occurred in phase 2 then remove the origin tile
+            if (tileIdx == 0) {
+                Tile tileToRemove = tiles.get(0);
+                board.removeMerelFromHistory(tileToRemove);
+                board.removeTileFromHistory(tileToRemove);
+                player.removeTile(tileToRemove);
+            }
+
+            // if a tile has been removed, then a merel now has to exist
+            if (isTileRemoved) {
+                board.addMerelFromHistory(tileToSet);
                 if (checkAndHandleGameWon())
                     notifyGamePhaseChanged();
             }
-            Tile tileToSet = tiles.get(tileIdx--);
-            board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
-            if (tileIdx == 0) {
-                Tile tileToRemove = tiles.get(0);
-                board.removeTileFromHistory(tileToRemove);
-            }
+
             if (phase != GamePhase.WON)
                 changePlayer();
         }
@@ -253,6 +307,7 @@ public class GameManager {
         player1 = history.getPlayer1();
         player2 = history.getPlayer2();
         currentPlayer = player1.getPlayerColor() == history.getCurrentPlayer() ? player1 : player2;
+        opponentPlayer = player1.getPlayerColor() == history.getCurrentPlayer() ? player2 : player1;
         tilesPlaced = history.getTilesPlaced();
 
         if (phase == GamePhase.PLACE)

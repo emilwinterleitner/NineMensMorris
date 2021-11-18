@@ -167,9 +167,8 @@ public class Board {
         for (TileSelectedListener tsl : tileSelectedListeners) {
             tsl.tileSelected(tile, playerColor);
         }
-
         selectedTile = tile;
-        getAllowedMoves();
+        getAllowedMoves(tile);
         filterAllowedMoves();
         showAllowedMoves(true);
     }
@@ -194,93 +193,106 @@ public class Board {
         allowedMoves.removeAll(invalidMoves);
     }
 
-    public void getAllowedMoves() {
-        if (selectedTile.equals(t00)) {
+    public int getAllowedMovesCount(List<Tile> tiles) {
+        int cnt = 0;
+
+        for (Tile t : tiles) {
+            getAllowedMoves(t);
+            filterAllowedMoves();
+            cnt += allowedMoves.size();
+            allowedMoves.clear();
+        }
+
+        return cnt;
+    }
+
+    public void getAllowedMoves(Tile t) {
+        if (t.equals(t00)) {
             allowedMoves.add(t30);
             allowedMoves.add(t03);
-        } else if (selectedTile.equals(t03)) {
+        } else if (t.equals(t03)) {
             allowedMoves.add(t00);
             allowedMoves.add(t06);
             allowedMoves.add(t13);
-        } else if (selectedTile.equals(t06)) {
+        } else if (t.equals(t06)) {
             allowedMoves.add(t03);
             allowedMoves.add(t36);
-        } else if (selectedTile.equals(t11)) {
+        } else if (t.equals(t11)) {
             allowedMoves.add(t31);
             allowedMoves.add(t13);
-        } else if (selectedTile.equals(t13)) {
+        } else if (t.equals(t13)) {
             allowedMoves.add(t11);
             allowedMoves.add(t15);
             allowedMoves.add(t03);
             allowedMoves.add(t23);
-        } else if (selectedTile.equals(t15)) {
+        } else if (t.equals(t15)) {
             allowedMoves.add(t13);
             allowedMoves.add(t35);
-        } else if (selectedTile.equals(t22)) {
+        } else if (t.equals(t22)) {
             allowedMoves.add(t32);
             allowedMoves.add(t23);
-        } else if (selectedTile.equals(t23)) {
+        } else if (t.equals(t23)) {
             allowedMoves.add(t22);
             allowedMoves.add(t24);
             allowedMoves.add(t13);
-        } else if (selectedTile.equals(t24)) {
+        } else if (t.equals(t24)) {
             allowedMoves.add(t23);
             allowedMoves.add(t34);
-        } else if (selectedTile.equals(t30)) {
+        } else if (t.equals(t30)) {
             allowedMoves.add(t00);
             allowedMoves.add(t60);
             allowedMoves.add(t31);
-        } else if (selectedTile.equals(t31)) {
+        } else if (t.equals(t31)) {
             allowedMoves.add(t51);
             allowedMoves.add(t11);
             allowedMoves.add(t30);
             allowedMoves.add(t32);
-        } else if (selectedTile.equals(t32)) {
+        } else if (t.equals(t32)) {
             allowedMoves.add(t22);
             allowedMoves.add(t42);
             allowedMoves.add(t31);
-        } else if (selectedTile.equals(t34)) {
+        } else if (t.equals(t34)) {
             allowedMoves.add(t24);
             allowedMoves.add(t44);
             allowedMoves.add(t35);
-        } else if (selectedTile.equals(t35)) {
+        } else if (t.equals(t35)) {
             allowedMoves.add(t15);
             allowedMoves.add(t55);
             allowedMoves.add(t34);
             allowedMoves.add(t36);
-        } else if (selectedTile.equals(t36)) {
+        } else if (t.equals(t36)) {
             allowedMoves.add(t06);
             allowedMoves.add(t66);
             allowedMoves.add(t35);
-        } else if (selectedTile.equals(t42)) {
+        } else if (t.equals(t42)) {
             allowedMoves.add(t32);
             allowedMoves.add(t43);
-        } else if (selectedTile.equals(t43)) {
+        } else if (t.equals(t43)) {
             allowedMoves.add(t42);
             allowedMoves.add(t44);
             allowedMoves.add(t53);
-        } else if (selectedTile.equals(t44)) {
+        } else if (t.equals(t44)) {
             allowedMoves.add(t34);
             allowedMoves.add(t43);
-        } else if (selectedTile.equals(t51)) {
+        } else if (t.equals(t51)) {
             allowedMoves.add(t31);
             allowedMoves.add(t53);
-        } else if (selectedTile.equals(t53)) {
+        } else if (t.equals(t53)) {
             allowedMoves.add(t51);
             allowedMoves.add(t55);
             allowedMoves.add(t43);
             allowedMoves.add(t63);
-        } else if (selectedTile.equals(t55)) {
+        } else if (t.equals(t55)) {
             allowedMoves.add(t53);
             allowedMoves.add(t35);
-        } else if (selectedTile.equals(t60)) {
+        } else if (t.equals(t60)) {
             allowedMoves.add(t30);
             allowedMoves.add(t63);
-        } else if (selectedTile.equals(t63)) {
+        } else if (t.equals(t63)) {
             allowedMoves.add(t60);
             allowedMoves.add(t66);
             allowedMoves.add(t53);
-        } else if (selectedTile.equals(t66)) {
+        } else if (t.equals(t66)) {
             allowedMoves.add(t36);
             allowedMoves.add(t63);
         }
@@ -405,7 +417,6 @@ public class Board {
     }
 
     public void reset() {
-
         allTiles = new ArrayList<>();
         allTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
             t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
@@ -416,5 +427,11 @@ public class Board {
         gameBoard = new HashMap<>();
         allowedMoves = new ArrayList<>();
         merelManager = new MerelManager();
+    }
+
+    public void printMap() {
+        for (Map.Entry<Tile, PlayerColor> m : gameBoard.entrySet()) {
+            System.out.println(m.getKey().getY() + ", " + m.getKey().getX() + " is occupied by " + m.getValue());
+        }
     }
 }

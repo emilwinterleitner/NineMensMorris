@@ -13,7 +13,6 @@ public class Board {
     private Map<Tile, PlayerColor> gameBoard;
 
     private List<Tile> allTiles;
-    private List<Tile> freeTiles;
     private List<Tile> allowedMoves;
 
     // All tiles of the game board,
@@ -79,8 +78,6 @@ public class Board {
                 tpl.tilePlaced(tile, playerColor);
             }
 
-            freeTiles.remove(tile);
-
             gameBoard.put(tile, playerColor);
 
             lastModifiedTile = tile;
@@ -125,7 +122,6 @@ public class Board {
         PlayerColor occupiedBy = gameBoard.get(tile);
 
         if (occupiedBy != color && occupiedBy != null && !merelManager.isPartOfMerel(tile)) {
-            freeTiles.add(tile);
             gameBoard.remove(tile);
             for (TileRemovedListener trl : tileRemovedListeners) {
                 trl.tileRemoved(tile);
@@ -137,7 +133,6 @@ public class Board {
     }
 
     public void removeTileFromHistory(Tile tileToRemove) {
-        freeTiles.add(tileToRemove);
         gameBoard.remove(tileToRemove);
         for (TileRemovedListener trl : tileRemovedListeners) {
             trl.tileRemoved(tileToRemove);
@@ -147,7 +142,6 @@ public class Board {
     private void removeSelectedTile() {
         originTile = selectedTile;
         merelManager.removeMerel(selectedTile);
-        freeTiles.add(selectedTile);
         gameBoard.remove(selectedTile);
         for (TileRemovedListener trl : tileRemovedListeners) {
             trl.tileRemoved(selectedTile);
@@ -406,7 +400,10 @@ public class Board {
     }
 
     public void setGameBoard(Map<Tile, PlayerColor> gameBoard) {
-        this.gameBoard = gameBoard;
+        for (Map.Entry<Tile, PlayerColor> m : gameBoard.entrySet()) {
+            Tile t = getTile(m.getKey().getY(), m.getKey().getX());
+            this.gameBoard.put(t, m.getValue());
+        }
         for (GameBoardChangedListener gcl : gameBoardChangedListeners) {
             gcl.gameBoardChanged(gameBoard);
         }
@@ -419,9 +416,6 @@ public class Board {
     public void reset() {
         allTiles = new ArrayList<>();
         allTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
-            t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
-        freeTiles = new ArrayList<>();
-        freeTiles.addAll(Arrays.asList(t00, t03, t06, t11, t13, t15, t22, t23, t24, t30, t31, t32,
             t34, t35, t36, t42, t43, t44, t51, t53, t55, t60, t63, t66));
 
         gameBoard = new HashMap<>();

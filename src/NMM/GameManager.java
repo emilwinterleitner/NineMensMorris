@@ -209,7 +209,7 @@ public class GameManager {
 
             // If a tile has been removed, re-add it
             if (isTileRemoved) {
-                Tile tileToSet = tiles.get(tileIdx--);
+                Tile tileToSet = convertTile(tiles.get(tileIdx--));
                 board.tryToSetTile(tileToSet.getY(), tileToSet.getX(),
                     color == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE);
                 board.removeMerelFromHistory(tiles.get(tileIdx));
@@ -217,14 +217,14 @@ public class GameManager {
             }
 
             // This tile for sure has to be removed no matter if phase 1 or 2
-            Tile tileToRemove = tiles.get(tileIdx--);
+            Tile tileToRemove = convertTile(tiles.get(tileIdx--));
             board.removeMerelFromHistory(tileToRemove);
             board.removeTileFromHistory(tileToRemove);
             player.removeTile(tileToRemove);
 
             // If a tile is left then this move occurred in phase 2 -> origin tile has to be set
             if (tileIdx == 0) {
-                Tile tileToSet = tiles.get(0);
+                Tile tileToSet = convertTile(tiles.get(0));
                 board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
                 player.addTile(tileToSet);
             }
@@ -255,19 +255,19 @@ public class GameManager {
 
             // If a tile has been removed, remove it
             if (isTileRemoved) {
-                Tile tileToRemove = tiles.get(tileIdx--);
+                Tile tileToRemove = convertTile(tiles.get(tileIdx--));
                 board.removeTileFromHistory(tileToRemove);
                 opponent.removeTile(tileToRemove);
             }
 
             // This tile for sure has to be set no matter which phase
-            Tile tileToSet = tiles.get(tileIdx--);
+            Tile tileToSet = convertTile(tiles.get(tileIdx--));
             board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
             player.addTile(tileToSet);
 
             // If a move occurred in phase 2 then remove the origin tile
             if (tileIdx == 0) {
-                Tile tileToRemove = tiles.get(0);
+                Tile tileToRemove = convertTile(tiles.get(0));
                 board.removeMerelFromHistory(tileToRemove);
                 board.removeTileFromHistory(tileToRemove);
                 player.removeTile(tileToRemove);
@@ -283,6 +283,10 @@ public class GameManager {
             if (phase != GamePhase.WON)
                 changePlayer();
         }
+    }
+
+    private Tile convertTile(Tile tile) {
+        return board.getTile(tile.getY(), tile.getX());
     }
 
     //endregion

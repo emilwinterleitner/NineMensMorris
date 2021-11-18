@@ -66,7 +66,6 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
         resetGameBoard();
         setGameManager(new GameManager());
         manager.startGame();
-        System.out.println("new game");
     }
 
     public void handleSave(ActionEvent actionEvent) {

@@ -26,15 +26,11 @@ public class Player implements Serializable {
     public void addTile(Tile t) {
         tilesOnBoardCount++;
         tilesOnBoard.add(t);
-        System.out.println("Added tile (" + t.getY() + ", " + t.getX() + ") to: " + getPlayerName());
-        System.out.println(getPlayerName() + " now has: " + tilesOnBoardCount + " tiles on board");
     }
 
     public void removeTile(Tile t) {
         tilesOnBoardCount--;
         tilesOnBoard.remove(t);
-        System.out.println("Removed tile (" + t.getY() + ",  " + t.getX() + ") from: " + getPlayerName());
-        System.out.println(getPlayerName() + " now has: " + tilesOnBoardCount + " tiles on board");
     }
 
     public int getTilesOnBoardCount() {

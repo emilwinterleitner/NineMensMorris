@@ -51,6 +51,8 @@ public class History implements Serializable {
         return move;
     }
 
+    //region Getter / Setter
+
     public Map<Tile, PlayerColor> getGameBoard() {
         return gameBoard;
     }
@@ -98,4 +100,6 @@ public class History implements Serializable {
     public int getTilesPlaced() { return tilesPlaced; }
 
     public void setTilesPlaced(int tilesPlaced) { this.tilesPlaced = tilesPlaced; }
+
+    //endregion
 }

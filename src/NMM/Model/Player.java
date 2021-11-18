@@ -21,10 +21,12 @@ public class Player implements Serializable {
 
     public void addTile() {
         tilesOnBoard++;
+        System.out.println("Added tile to: " + getPlayerName());
     }
 
     public void removeTile() {
         tilesOnBoard--;
+        System.out.println("Removed tile from: " + getPlayerName());
     }
 
     public int getTilesOnBoard() {

@@ -2,10 +2,7 @@ package NMM;
 
 import NMM.Enums.GamePhase;
 import NMM.Enums.PlayerColor;
-import NMM.GameManagerState.GameManagerMoveState;
-import NMM.GameManagerState.GameManagerPlaceState;
-import NMM.GameManagerState.GameManagerRemoveState;
-import NMM.GameManagerState.GameManagerState;
+import NMM.GameManagerState.*;
 import NMM.Interfaces.CurrentPlayerListener;
 import NMM.Interfaces.GamePhaseListener;
 import NMM.Model.*;
@@ -74,20 +71,23 @@ public class GameManager {
             if (gameManagerState instanceof GameManagerRemoveState) {
                 opponentPlayer.removeTile();
                 move.setIsTileRemoved();
-                if (tilesPlaced > 17) {
-                    gameManagerState = new GameManagerMoveState();
-                    phase = GamePhase.MOVE;
-                } else {
-                    gameManagerState = new GameManagerPlaceState();
-                    phase = GamePhase.PLACE;
+
+                if (!checkAndHandleGameWon()) {
+                    if (tilesPlaced > 17) {
+                        gameManagerState = new GameManagerMoveState();
+                        phase = GamePhase.MOVE;
+                    } else {
+                        gameManagerState = new GameManagerPlaceState();
+                        phase = GamePhase.PLACE;
+                    }
                 }
                 notifyGamePhaseChanged();
-            }
-
-            if (board.checkForMerel()) {
-                gameManagerState = new GameManagerRemoveState();
-                phase = GamePhase.REMOVE;
-                notifyGamePhaseChanged();
+            } else {
+                if (board.checkForMerel()) {
+                    gameManagerState = new GameManagerRemoveState();
+                    phase = GamePhase.REMOVE;
+                    notifyGamePhaseChanged();
+                }
             }
 
             if (!(gameManagerState instanceof GameManagerRemoveState))
@@ -95,9 +95,22 @@ public class GameManager {
         }
     }
 
+    private boolean checkAndHandleGameWon() {
+        boolean won = false;
+
+        if (opponentPlayer.getTilesOnBoard() < 3 && tilesPlaced > 17) {
+            gameManagerState = new GameManagerWonState();
+            phase = GamePhase.WON;
+            won = true;
+        }
+
+        return won;
+    }
+
     private void endTurn() {
         history.addMove(move);
-        changePlayer();
+        if (!(gameManagerState instanceof GameManagerWonState))
+            changePlayer();
     }
 
     private void changePlayer() {
@@ -122,6 +135,14 @@ public class GameManager {
     public void Undo() {
         Move moveToUndo = null;
 
+        // Handle special case that the winning move is reverted
+        if (phase == GamePhase.WON) {
+            gameManagerState = new GameManagerMoveState();
+            phase = GamePhase.MOVE;
+            notifyGamePhaseChanged();
+            changePlayer();
+        }
+
         if (phase == GamePhase.REMOVE) {
             moveToUndo = move;
             changePlayer();
@@ -145,7 +166,7 @@ public class GameManager {
 
             if (tiles.size() == 1 || tiles.size() == 2 && isTileRemoved) {
                 tilesPlaced--;
-                currentPlayer.removeTile();
+                opponentPlayer.removeTile();
                 if (phase == GamePhase.MOVE) {
                     gameManagerState = new GameManagerPlaceState();
                     phase = GamePhase.PLACE;
@@ -158,7 +179,7 @@ public class GameManager {
                 board.tryToSetTile(tileToSet.getY(), tileToSet.getX(),
                     color == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE);
                 board.removeMerelFromHistory(tiles.get(tileIdx));
-                opponentPlayer.addTile();
+                currentPlayer.addTile();
             }
             Tile tileToRemove = tiles.get(tileIdx--);
             board.removeTileFromHistory(tileToRemove);
@@ -195,6 +216,8 @@ public class GameManager {
                 board.removeTileFromHistory(tileToRemove);
                 board.addMerelFromHistory(tiles.get(tileIdx));
                 opponentPlayer.removeTile();
+                if (checkAndHandleGameWon())
+                    notifyGamePhaseChanged();
             }
             Tile tileToSet = tiles.get(tileIdx--);
             board.tryToSetTile(tileToSet.getY(), tileToSet.getX(), color);
@@ -202,7 +225,8 @@ public class GameManager {
                 Tile tileToRemove = tiles.get(0);
                 board.removeTileFromHistory(tileToRemove);
             }
-            changePlayer();
+            if (phase != GamePhase.WON)
+                changePlayer();
         }
     }
 
@@ -229,15 +253,18 @@ public class GameManager {
         player2 = history.getPlayer2();
         currentPlayer = player1.getPlayerColor() == history.getCurrentPlayer() ? player1 : player2;
         tilesPlaced = history.getTilesPlaced();
-        notifyGamePhaseChanged();
-        notifyPlayerChanged();
 
         if (phase == GamePhase.PLACE)
             gameManagerState = new GameManagerPlaceState();
-        else
+        else if (phase == GamePhase.MOVE)
             gameManagerState = new GameManagerMoveState();
+        else
+            gameManagerState = new GameManagerWonState();
 
         move = new Move(currentPlayer.getPlayerColor());
+
+        notifyGamePhaseChanged();
+        notifyPlayerChanged();
     }
 
     public void Save() {

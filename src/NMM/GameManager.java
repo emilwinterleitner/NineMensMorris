@@ -285,6 +285,7 @@ public class GameManager {
         }
     }
 
+    // used to get the exact tile objects from the new game board
     private Tile convertTile(Tile tile) {
         return board.getTile(tile.getY(), tile.getX());
     }

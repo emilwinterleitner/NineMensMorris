@@ -52,6 +52,13 @@ public class Board {
     private List<AllowedMovesChangedListener> allowedMovesChangedListeners = new ArrayList<>();
     private List<GameBoardChangedListener> gameBoardChangedListeners = new ArrayList<>();
 
+    public void addTilePlacedListener(TilePlacedListener listener) { tilePlacedListeners.add(listener); }
+    public void addTileSelectedListener(TileSelectedListener listener) { tileSelectedListeners.add(listener); }
+    public void addSelectedTileChangeListener(SelectedTileChangeListener listener) { selectedTileChangeListeners.add(listener); }
+    public void addTileRemovedListener(TileRemovedListener listener) { tileRemovedListeners.add(listener); }
+    public void addAllowedMovesChangedListener(AllowedMovesChangedListener listener) { allowedMovesChangedListeners.add(listener); }
+    public void addGameBoardChangedListener(GameBoardChangedListener listener) { gameBoardChangedListeners.add(listener); }
+
     private Board() {
         reset();
     }
@@ -60,10 +67,6 @@ public class Board {
         if (instance == null)
             instance = new Board();
         return instance;
-    }
-
-    public Tile getOriginTile() {
-        return originTile;
     }
 
     public boolean tryToSetTile(int row, int col, PlayerColor playerColor) {
@@ -85,13 +88,6 @@ public class Board {
 
         return result;
     }
-
-    public void addTilePlacedListener(TilePlacedListener listener) { tilePlacedListeners.add(listener); }
-    public void addTileSelectedListener(TileSelectedListener listener) { tileSelectedListeners.add(listener); }
-    public void addSelectedTileChangeListener(SelectedTileChangeListener listener) { selectedTileChangeListeners.add(listener); }
-    public void addTileRemovedListener(TileRemovedListener listener) { tileRemovedListeners.add(listener); }
-    public void addAllowedMovesChangedListener(AllowedMovesChangedListener listener) { allowedMovesChangedListeners.add(listener); }
-    public void addGameBoardChangedListener(GameBoardChangedListener listener) { gameBoardChangedListeners.add(listener); }
 
     public boolean tryToSelectTile(int row, int col, PlayerColor playerColor) {
         boolean result = false;
@@ -305,6 +301,8 @@ public class Board {
         return requestedTile;
     }
 
+    //region Merels
+
     public boolean checkForMerel() {
         boolean result = false;
 
@@ -389,6 +387,12 @@ public class Board {
     public void addMerelFromHistory(Tile tile) {
         lastModifiedTile = tile;
         checkForMerel();
+    }
+
+    //endregion
+
+    public Tile getOriginTile() {
+        return originTile;
     }
 
     public Map<Tile, PlayerColor> getGameBoard() {

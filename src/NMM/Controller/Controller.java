@@ -62,33 +62,6 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     @FXML Button btn63;
     @FXML Button btn66;
 
-    public void handleNewGame(ActionEvent actionEvent) {
-        resetGameBoard();
-        setGameManager(new GameManager());
-        manager.startGame();
-    }
-
-    public void handleSave(ActionEvent actionEvent) {
-        manager.Save();
-    }
-
-    public void handleLoad(ActionEvent actionEvent) {
-        setGameManager(new GameManager());
-        manager.Load();
-    }
-
-    public void setGameManager(GameManager manager) {
-        if (manager != null) {
-            if (this.manager != null) {
-                manager.removeCurrentPlayerListener(this);
-                manager.removeGamePhaseListener(this);
-            }
-            this.manager = manager;
-            manager.addCurrentPlayerListener(this);
-            manager.addGamePhaseListener(this);
-        }
-    }
-
     @FXML
     private void initialize() {
         board = Board.getInstance();
@@ -128,12 +101,46 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
         btnRedo.setOnAction(event -> manager.Redo());
     }
 
+
+    //region Menu
+
+    public void handleNewGame(ActionEvent actionEvent) {
+        resetGameBoard();
+        setGameManager(new GameManager());
+        manager.startGame();
+    }
+
+    public void handleSave(ActionEvent actionEvent) {
+        manager.Save();
+    }
+
+    public void handleLoad(ActionEvent actionEvent) {
+        setGameManager(new GameManager());
+        manager.Load();
+    }
+
+    //endregion
+
+    public void setGameManager(GameManager manager) {
+        if (manager != null) {
+            if (this.manager != null) {
+                manager.removeCurrentPlayerListener(this);
+                manager.removeGamePhaseListener(this);
+            }
+            this.manager = manager;
+            manager.addCurrentPlayerListener(this);
+            manager.addGamePhaseListener(this);
+        }
+    }
+
     private void tileClicked(EventTarget target) {
         Node node = (Node) target;
         int row = GridPane.getRowIndex(node);
         int col = GridPane.getColumnIndex(node);
         manager.tilePressed(row, col);
     }
+
+    //region Interfaces
 
     @Override
     public void playerChanged(Player currentPlayer) {
@@ -155,20 +162,6 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
     public void tileSelected(Tile t, PlayerColor color) {
         Button b = (Button) getNode(t.getX(), t.getY());
         b.setGraphic(TileFactory.getTile(color, false, true));
-    }
-
-    private Node getNode(int x, int y) {
-        Node node = null;
-
-        for (Node n : boardGrid.getChildren()) {
-            if (GridPane.getRowIndex(n) == y
-                && GridPane.getColumnIndex(n) == x) {
-                node = n;
-                break;
-            }
-        }
-
-        return node;
     }
 
     @Override
@@ -202,6 +195,22 @@ public class Controller implements CurrentPlayerListener, TilePlacedListener, Ga
             Button b = (Button) getNode(t.getX(), t.getY());
             b.setGraphic(TileFactory.getTile(gameBoard.get(t), false, false));
         }
+    }
+
+    //endregion
+
+    private Node getNode(int x, int y) {
+        Node node = null;
+
+        for (Node n : boardGrid.getChildren()) {
+            if (GridPane.getRowIndex(n) == y
+                && GridPane.getColumnIndex(n) == x) {
+                node = n;
+                break;
+            }
+        }
+
+        return node;
     }
 
     public void resetGameBoard() {
